@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 
-class Navi extends Component {
+class Navizxc extends Component {
   constructor() {
     super();
     this.state = { users: [], loading: true };
@@ -71,4 +71,4 @@ class Navi extends Component {
     );
   }
 }
-export default Navi;
+export default Navizxc;

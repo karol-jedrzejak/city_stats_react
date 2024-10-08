@@ -33,7 +33,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Navi2() {
+export default function Navigation() {
   return (
     <>
       {/*

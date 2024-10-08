@@ -1,12 +1,12 @@
 import React from "react";
-import Navi from "./navi";
-import Navi2 from "./Navi2";
+import Navigation from "./Navigation";
+import AllCities from "./AllCities";
 
 const App = () => {
   return (
     <div>
-      <Navi2 />
-      <Navi />
+      <Navigation />
+      <AllCities />
     </div>
   );
 };

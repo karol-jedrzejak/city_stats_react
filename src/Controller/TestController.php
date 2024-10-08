@@ -10,13 +10,85 @@ use Symfony\Component\HttpFoundation\Response;
 class TestController extends AbstractController
 {
     #[Route('/test', methods: ['GET'], name: 'app_test.index')]
-    public function index(): Response
+    public function index2(): Response
     {
         return $this->render('test.html.twig');
     }
 
-    #[Route('/api/test', methods: ['GET'], name: 'app_test2.index')]
-    public function getUsers(): Response
+    #[Route('apix/cities', methods: ['GET'], name: 'cities.index')]
+    public function cities2(): Response
+    {
+        $data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population/cities');
+
+        $test = json_decode($data);
+
+        dd($test);
+
+
+        $response = new Response();
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        $response->setContent($data);
+
+        return $response;
+    }
+
+
+    #[Route('apix/citiess', methods: ['GET'], name: 'citiess.search')]
+    public function citiess2(): Response
+    {
+        /* 
+        $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
+        $data = ['orderBy' => 'populationCounts'];
+ */
+        $url = 'https://countriesnow.space/api/v0.1/countries/population/cities';
+        $data = ['city' => 'shanghai'];
+
+        // use key 'http' even if you send the request to https://...
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $data = file_get_contents($url, false, $context);
+        if ($data === false) {
+            /* Handle error */
+        }
+
+        $response = new Response();
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        $response->setContent($data);
+
+        return $response;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #[Route('/apix/test', methods: ['GET'], name: 'app_test2.index')]
+    public function getUsers2(): Response
     {
         $users = [
             [
@@ -61,8 +133,8 @@ class TestController extends AbstractController
         return $response;
     }
 
-    #[Route('/api/testb', methods: ['GET'], name: 'app_test3.index')]
-    public function getUsers2(): Response
+    #[Route('/apix/testb', methods: ['GET'], name: 'app_test3.index')]
+    public function getUsers3(): Response
     {
         $users = [
             [
