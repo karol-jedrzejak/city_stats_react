@@ -1,23 +1,28 @@
 import { useState } from "react";
-import tableData1 from "./tableData1.json";
 import TableBody from "./TableBody";
 import TableHead from "./TableHead";
 
 const Table = (props) => {
-  const [tableData, setTableData] = useState(tableData1);
+  const [tableData, setTableData] = useState(props.tableData);
 
-  /*   const columns2 = [
-    { label: "Full Name", accessor: "full_name" },
-    { label: "Email", accessor: "email" },
-    { label: "Gender", accessor: "gender" },
-    { label: "Age", accessor: "age" },
-    { label: "Start date", accessor: "start_date" },
-  ]; */
+  const handleSorting = (sortField, sortOrder) => {
+    if (sortField) {
+      const sorted = [...tableData].sort((a, b) => {
+        return (
+          a[sortField].toString().localeCompare(b[sortField].toString(), "en", {
+            numeric: true,
+          }) * (sortOrder === "asc" ? 1 : -1)
+        );
+      });
+      setTableData(sorted);
+    }
+    console.log(sortField, sortOrder);
+  };
 
   return (
     <>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <TableHead columns={props.columns} />
+        <TableHead columns={props.columns} handleSorting={handleSorting} />
         <TableBody columns={props.columns} tableData={tableData} />
       </table>
     </>

@@ -14,8 +14,9 @@ class ApiCitiesController extends AbstractController
     {
 
         $post_data = json_decode($request->getContent(), true);
+
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
-        $data = ['orderBy' => 'populationCounts', $post_data['order']];
+        $data = ['orderBy' => 'populationCounts', "order" => $post_data['order']];
 
         $options = [
             'http' => [
@@ -31,6 +32,22 @@ class ApiCitiesController extends AbstractController
             /* Handle error */
         }
 
+        $decoded_data = json_decode($data);
+
+        $new_data = $decoded_data->data;
+
+        foreach ($new_data as $key => $item) {
+            if (is_numeric($item->populationCounts[0]->value)) {
+                $item->population_value = (int) $item->populationCounts[0]->value;
+                $item->population_year = $item->populationCounts[0]->year;
+                $item->id = $key;
+            } else {
+                unset($new_data[$key]);
+            }
+        }
+
+        $data = json_encode($new_data);
+
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
@@ -45,7 +62,7 @@ class ApiCitiesController extends AbstractController
     {
 
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
-        $data = ['orderBy' => 'populationCounts', "order" => "dsc"];
+        $data = ['orderBy' => 'populationCounts', "order" => "asc"];
 
         $options = [
             'http' => [
