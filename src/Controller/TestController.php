@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TestController extends AbstractController
 {
-    #[Route('/test', methods: ['GET'], name: 'app_test.index')]
+    /*     #[Route('/test', methods: ['GET'], name: 'app_test.index')]
     public function index2(): Response
     {
         return $this->render('test.html.twig');
@@ -39,14 +39,13 @@ class TestController extends AbstractController
     #[Route('apix/citiess', methods: ['GET'], name: 'citiess.search')]
     public function citiess2(): Response
     {
-        /* 
+        
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
         $data = ['orderBy' => 'populationCounts'];
- */
+ 
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities';
         $data = ['city' => 'shanghai'];
 
-        // use key 'http' even if you send the request to https://...
         $options = [
             'http' => [
                 'header' => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -58,7 +57,7 @@ class TestController extends AbstractController
         $context = stream_context_create($options);
         $data = file_get_contents($url, false, $context);
         if ($data === false) {
-            /* Handle error */
+
         }
 
         $response = new Response();
@@ -70,20 +69,6 @@ class TestController extends AbstractController
 
         return $response;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -165,5 +150,5 @@ class TestController extends AbstractController
         $response->setContent(json_encode($users));
 
         return $response;
-    }
+    } */
 }

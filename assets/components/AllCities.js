@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import Table from "./table/Table";
 
 class AllCities extends Component {
   constructor() {
@@ -9,42 +10,45 @@ class AllCities extends Component {
       loading: true,
       sorting: "asc",
     };
+
+    this.columns = [
+      { label: "Full Name 2", accessor: "full_name" },
+      { label: "Email", accessor: "email" },
+      { label: "Gender", accessor: "gender" },
+      { label: "Age", accessor: "age" },
+      { label: "Start date", accessor: "start_date" },
+    ];
   }
 
   componentDidMount() {
-    this.getCities();
-    console.log(this.state.cities);
+    this.postCities();
   }
 
   // get
-  /*   getCities() {
+  getCities() {
     axios.get(`http://localhost:8000/api/cities/get`).then((cities) => {
       this.setState({ cities: cities.data, loading: false });
     });
-  } */
+  }
 
   // post
-  getCities() {
-    let axiosConfig = {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods":
-          '"GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"',
-        "Access-Control-Allow-Headers": '"Content-Type", "Authorization"',
-        "Access-Control-Max-Age": "3600",
-        "Access-Control-Expose-Headers": "Link",
-      },
-    };
-
+  postCities() {
     let data = {
-      order: "dsc",
+      order: "asc",
     };
 
-    axios
-      .post("http://localhost:8000/api/cities", data, axiosConfig)
-      .then((cities) => {
-        this.setState({ cities: cities.data, loading: false });
-      });
+    //axios.defaults.headers.post["Content-Type"] = "application/json";
+    //axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    /*     axios.defaults.headers.post["Access-Control-Allow-Methods"] = "GET,POST";
+    axios.defaults.headers.post["Access-Control-Allow-Credentials"] = "true";
+    axios.defaults.headers.post["Access-Control-Allow-Headers"] =
+      "Content-Type";
+    axios.defaults.headers.post["Access-Control-Expose-Headers"] = "*";
+    axios.defaults.headers.post["Access-Control-Max-Age"] = "3600"; */
+
+    axios.post("http://localhost:8000/api/cities/post", data).then((cities) => {
+      this.setState({ cities: cities.data, loading: false });
+    });
   }
 
   render() {
@@ -71,7 +75,7 @@ class AllCities extends Component {
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Population
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                       Sort?
                     </button>
                   </th>
@@ -79,7 +83,10 @@ class AllCities extends Component {
               </thead>
               <tbody>
                 {this.state.cities.data.map((city) => (
-                  <tr className="even:bg-gray-50 odd:bg-white border-b">
+                  <tr
+                    className="even:bg-gray-50 odd:bg-white border-b"
+                    key={city.city}
+                  >
                     <td>{city.city}</td>
                     <td>{city.country}</td>
                     <td>{city.populationCounts[0].year}</td>
@@ -90,6 +97,9 @@ class AllCities extends Component {
             </table>
           </div>
         )}
+        <div className="p-10 w-full">
+          <Table columns={this.columns} />
+        </div>
       </div>
     );
   }

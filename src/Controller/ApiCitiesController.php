@@ -9,17 +9,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ApiCitiesController extends AbstractController
 {
-    #[Route('/api/cities', methods: ['POST'], name: 'api.cities.post')]
-    public function api_cities(Request $request): Response
+    #[Route('/api/cities/post', methods: ['POST'], name: 'api.cities.post')]
+    public function api_cities_post(Request $request): Response
     {
 
         $post_data = json_decode($request->getContent(), true);
-
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
-        $data = ['orderBy' => 'populationCounts', "order" => $post_data['order']];
-
-        /*         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities';
-        $data = ['city' => 'poznan']; */
+        $data = ['orderBy' => 'populationCounts', $post_data['order']];
 
         $options = [
             'http' => [
@@ -36,10 +32,8 @@ class ApiCitiesController extends AbstractController
         }
 
         $response = new Response();
-
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
-
         $response->setContent($data);
 
         return $response;
@@ -47,14 +41,11 @@ class ApiCitiesController extends AbstractController
 
 
     #[Route('/api/cities/get', methods: ['GET'], name: 'api.cities.get')]
-    public function get_api_cities(): Response
+    public function api_cities_get(): Response
     {
 
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
         $data = ['orderBy' => 'populationCounts', "order" => "dsc"];
-
-        /*         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities';
-        $data = ['city' => 'poznan']; */
 
         $options = [
             'http' => [
