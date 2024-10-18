@@ -17,6 +17,8 @@ class AllCities extends Component {
       { label: "Year", accessor: "population_year" },
       { label: "Value", accessor: "population_value" },
     ];
+
+    this.defaultSorting = { accessor: "population_value", direction: "asc" };
   }
 
   componentDidMount() {
@@ -53,7 +55,11 @@ class AllCities extends Component {
           </div>
         ) : (
           <div className="p-10 w-full">
-            <Table columns={this.columns} tableData={this.state.cities.data} />
+            <Table
+              columns={this.columns}
+              defaultSorting={this.defaultSorting}
+              tableData={this.state.cities.data}
+            />
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const TableHead = ({ columns, handleSorting }) => {
+const TableHead = ({ columns, handleSorting, defaultSorting }) => {
   const [sortField, setSortField] = useState("");
   const [order, setOrder] = useState("asc");
 
@@ -16,21 +16,45 @@ const TableHead = ({ columns, handleSorting }) => {
     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
       <tr>
         {columns.map(({ label, accessor }) => {
-          return (
-            <th
-              scope="col"
-              className="px-6 py-3"
-              key={accessor}
-              onClick={() => handleSortingChange(accessor)}
-            >
-              {label}
+          let arrow = "";
+          if (
+            (sortField === accessor && order === "asc") ||
+            (sortField === "" &&
+              defaultSorting.accessor === accessor &&
+              defaultSorting.direction === "asc")
+          ) {
+            arrow = (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
+                strokeWidth="1"
                 stroke="currentColor"
-                className="size-6"
+                className="size-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3"
+                />
+              </svg>
+            );
+          }
+
+          if (
+            (sortField === accessor && order === "desc") ||
+            (sortField === "" &&
+              defaultSorting.accessor === accessor &&
+              defaultSorting.direction === "desc")
+          ) {
+            arrow = (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1"
+                stroke="currentColor"
+                className="size-4"
               >
                 <path
                   strokeLinecap="round"
@@ -38,6 +62,22 @@ const TableHead = ({ columns, handleSorting }) => {
                   d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18"
                 />
               </svg>
+            );
+          }
+
+          console.log([arrow, sortField, accessor, order, defaultSorting]);
+
+          return (
+            <th
+              scope="col"
+              className="px-6 py-3"
+              key={accessor}
+              onClick={() => handleSortingChange(accessor)}
+            >
+              <div className="flex">
+                {label}
+                {arrow}
+              </div>
             </th>
           );
         })}
