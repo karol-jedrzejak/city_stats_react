@@ -74,7 +74,7 @@ const TableHead = ({ columns, handleSorting, defaultSorting }) => {
               key={accessor}
               onClick={() => handleSortingChange(accessor)}
             >
-              <div className="flex">
+              <div className="flex cursor-pointer">
                 {label}
                 {arrow}
               </div>
