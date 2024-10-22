@@ -2,6 +2,15 @@ import React, { Component } from "react";
 import axios from "axios";
 import Table from "./table/Table";
 
+import {
+  MapContainer,
+  TileLayer,
+  useMap,
+  Marker,
+  Popup,
+  Icon,
+} from "react-leaflet";
+
 class AllCities extends Component {
   constructor() {
     super();
@@ -47,6 +56,14 @@ class AllCities extends Component {
 
   render() {
     const loading = this.state.loading;
+    const position = [51.505, -0.09];
+    const markerIcon = new L.Icon({
+      iconUrl: require("../../public/leaflet/marker-icon-blue.png"),
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [0, -46],
+    });
+
     return (
       <div>
         {loading ? (
@@ -54,12 +71,32 @@ class AllCities extends Component {
             <span>LOADING</span>
           </div>
         ) : (
-          <div className="p-10 w-full">
-            <Table
-              columns={this.columns}
-              defaultSorting={this.defaultSorting}
-              tableData={this.state.cities.data}
-            />
+          <div>
+            <div className="p-5 w-full">
+              <MapContainer
+                center={[51.505, -0.09]}
+                zoom={1}
+                style={{ height: "600px" }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  detectRetina="true"
+                />
+                <Marker icon={markerIcon} position={[51.505, -0.09]}>
+                  <Popup>
+                    A pretty CSS3 popup. <br /> Easily customizable.
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+            <div className="p-10 w-full">
+              <Table
+                columns={this.columns}
+                defaultSorting={this.defaultSorting}
+                tableData={this.state.cities.data}
+              />
+            </div>
           </div>
         )}
       </div>
