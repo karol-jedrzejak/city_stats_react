@@ -33,14 +33,28 @@ class ApiCitiesController extends AbstractController
         }
 
         $decoded_data = json_decode($data);
-
         $new_data = $decoded_data->data;
+
+        // Get GPS coordinates
+        $data_gps = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
+        $decoded_data_gps = json_decode($data_gps);
 
         foreach ($new_data as $key => $item) {
             if (is_numeric($item->populationCounts[0]->value)) {
                 $item->population_value = (int) $item->populationCounts[0]->value;
                 $item->population_year = $item->populationCounts[0]->year;
                 $item->id = $key;
+
+                $obj = array_column($decoded_data_gps->data, null, 'name')[$item->country] ?? null;
+                if ($obj) {
+                    $item->iso2 = $obj->iso2;
+                    $item->long = $obj->long;
+                    $item->lat = $obj->lat;
+                } else {
+                    $item->iso2 = "";
+                    $item->long = 0;
+                    $item->lat = 0;
+                }
             } else {
                 unset($new_data[$key]);
             }
@@ -77,6 +91,47 @@ class ApiCitiesController extends AbstractController
         if ($data === false) {
             /* Handle error */
         }
+
+
+
+
+
+
+
+
+
+
+
+
+        $decoded_data = json_decode($data);
+        $new_data = $decoded_data->data;
+
+        // Get GPS coordinates
+        $data_gps = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
+        $decoded_data_gps = json_decode($data_gps);
+
+        foreach ($new_data as $key => $item) {
+            if (is_numeric($item->populationCounts[0]->value)) {
+                $item->population_value = (int) $item->populationCounts[0]->value;
+                $item->population_year = $item->populationCounts[0]->year;
+                $item->id = $key;
+
+                $obj = array_column($decoded_data_gps->data, null, 'name')[$item->country] ?? null;
+                if ($obj) {
+                    $item->iso2 = $obj->iso2;
+                    $item->long = $obj->long;
+                    $item->lat = $obj->lat;
+                } else {
+                    $item->iso2 = "";
+                    $item->long = 0;
+                    $item->lat = 0;
+                }
+            } else {
+                unset($new_data[$key]);
+            }
+        }
+
+        $data = json_encode($new_data);
 
         $response = new Response();
 

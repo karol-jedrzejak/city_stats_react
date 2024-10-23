@@ -56,9 +56,16 @@ class AllCities extends Component {
 
   render() {
     const loading = this.state.loading;
-    const position = [51.505, -0.09];
-    const markerIcon = new L.Icon({
+
+    const markerBlue = new L.Icon({
       iconUrl: require("../../public/leaflet/marker-icon-blue.png"),
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [0, -46],
+    });
+
+    const markerRed = new L.Icon({
+      iconUrl: require("../../public/leaflet/marker-icon-red.png"),
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [0, -46],
@@ -75,7 +82,7 @@ class AllCities extends Component {
             <div className="p-5 w-full">
               <MapContainer
                 center={[51.505, -0.09]}
-                zoom={1}
+                zoom={7}
                 style={{ height: "600px" }}
               >
                 <TileLayer
@@ -83,11 +90,18 @@ class AllCities extends Component {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   detectRetina="true"
                 />
-                <Marker icon={markerIcon} position={[51.505, -0.09]}>
+                <Marker icon={markerBlue} position={[51.505, -0.09]}>
                   <Popup>
                     A pretty CSS3 popup. <br /> Easily customizable.
                   </Popup>
                 </Marker>
+                {this.state.cities.data.map((item) => (
+                  <Marker icon={markerRed} position={[item.lat, item.long]}>
+                    <Popup>
+                      {item.country} - {item.iso2}.
+                    </Popup>
+                  </Marker>
+                ))}
               </MapContainer>
             </div>
             <div className="p-10 w-full">
