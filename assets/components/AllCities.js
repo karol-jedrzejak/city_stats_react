@@ -98,7 +98,7 @@ class AllCities extends Component {
                 {this.state.cities.data.map((item) => (
                   <Marker icon={markerRed} position={[item.lat, item.long]}>
                     <Popup>
-                      {item.country} - {item.iso2}.
+                      {item.country} ({item.iso2}).
                     </Popup>
                   </Marker>
                 ))}
