@@ -65,8 +65,6 @@ const TableHead = ({ columns, handleSorting, defaultSorting }) => {
             );
           }
 
-          console.log([arrow, sortField, accessor, order, defaultSorting]);
-
           return (
             <th
               scope="col"

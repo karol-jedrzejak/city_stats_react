@@ -56,7 +56,7 @@ class AllCities extends Component {
 
   render() {
     const loading = this.state.loading;
-
+    /* 
     const markerBlue = new L.Icon({
       iconUrl: require("../../public/leaflet/marker-icon-blue.png"),
       iconSize: [25, 41],
@@ -69,7 +69,7 @@ class AllCities extends Component {
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [0, -46],
-    });
+    }); */
 
     return (
       <div>
@@ -80,7 +80,7 @@ class AllCities extends Component {
         ) : (
           <div>
             <div className="p-5 w-full">
-              <MapContainer
+              {/*               <MapContainer
                 center={[51.505, -0.09]}
                 zoom={7}
                 style={{ height: "600px" }}
@@ -102,7 +102,7 @@ class AllCities extends Component {
                     </Popup>
                   </Marker>
                 ))}
-              </MapContainer>
+              </MapContainer> */}
             </div>
             <div className="p-10 w-full">
               <Table

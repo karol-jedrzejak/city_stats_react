@@ -16,7 +16,6 @@ const Table = (props) => {
       });
       setTableData(sorted);
     }
-    console.log(sortField, sortOrder);
   };
 
   return (
