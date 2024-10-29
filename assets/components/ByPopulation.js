@@ -11,7 +11,7 @@ import {
   Icon,
 } from "react-leaflet";
 
-class AllCities extends Component {
+class ByPopulation extends Component {
   constructor() {
     super();
     this.state = {
@@ -79,8 +79,8 @@ class AllCities extends Component {
           </div>
         ) : (
           <div>
-            <div className="p-5 w-full">
-              {/*               <MapContainer
+            {/*<div className="p-5 w-full">
+                             <MapContainer
                 center={[51.505, -0.09]}
                 zoom={7}
                 style={{ height: "600px" }}
@@ -102,8 +102,8 @@ class AllCities extends Component {
                     </Popup>
                   </Marker>
                 ))}
-              </MapContainer> */}
-            </div>
+              </MapContainer> 
+            </div>*/}
             <div className="p-10 w-full">
               <Table
                 columns={this.columns}
@@ -117,4 +117,4 @@ class AllCities extends Component {
     );
   }
 }
-export default AllCities;
+export default ByPopulation;

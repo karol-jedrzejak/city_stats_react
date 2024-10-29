@@ -2,17 +2,19 @@ import React from "react";
 import { useState } from "react";
 
 import Navigation from "./Navigation";
-import AllCities from "./AllCities";
-import AllCities2 from "./AllCities2";
+import ByPopulation from "./ByPopulation";
+import Countries from "./Countries";
+import Capitals from "./Capitals";
+import City from "./City";
+import Map from "./Map";
 
 const App = () => {
   const [navigation, setNavigation] = useState([
-    { name: "Dashboard", href: "#", current: true, page: <AllCities /> },
-    { name: "Dashboard2", href: "#", current: false, page: <AllCities2 /> },
-    { name: "Team", href: "#", current: false, page: <AllCities /> },
-    { name: "Projects", href: "#", current: false, page: <AllCities /> },
-    { name: "Calendar", href: "#", current: false, page: <AllCities /> },
-    { name: "Reports", href: "#", current: false, page: <AllCities /> },
+    { name: "By Population", href: "#", current: true }, // dane wszystkich miast
+    { name: "Countries", href: "#", current: false }, // dane wszystkich miast w danym kraju
+    { name: "Capitals", href: "#", current: false }, // dane wszystkich stolic
+    { name: "City", href: "#", current: false }, // dane wybranego miasta
+    { name: "Map", href: "#", current: false }, // mapka państw
   ]);
 
   const changeCurrent = (current) => {
@@ -31,10 +33,18 @@ const App = () => {
     const current = navigation.find((element) => element.current === true);
 
     switch (current.name) {
-      case "Dashboard2":
-        return <AllCities2 />;
+      case "By Population":
+        return <ByPopulation />;
+      case "Countries":
+        return <Countries />;
+      case "Capitals":
+        return <Capitals />;
+      case "City":
+        return <City />;
+      case "Map":
+        return <Map />;
       default:
-        return <AllCities />;
+        return <ByPopulation />;
     }
   };
 
