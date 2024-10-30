@@ -72,14 +72,15 @@ class ByPopulation extends Component {
     }); */
 
     return (
-      <div>
-        {loading ? (
-          <div className="row text-center">
-            <span>LOADING</span>
-          </div>
-        ) : (
-          <div>
-            {/*<div className="p-5 w-full">
+      <div className="min-h-full">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {loading ? (
+            <div className="row text-center">
+              <span>LOADING</span>
+            </div>
+          ) : (
+            <div>
+              {/*<div className="p-5 w-full">
                              <MapContainer
                 center={[51.505, -0.09]}
                 zoom={7}
@@ -104,15 +105,16 @@ class ByPopulation extends Component {
                 ))}
               </MapContainer> 
             </div>*/}
-            <div className="p-10 w-full">
-              <Table
-                columns={this.columns}
-                defaultSorting={this.defaultSorting}
-                tableData={this.state.cities.data}
-              />
+              <div className="p-10 w-full">
+                <Table
+                  columns={this.columns}
+                  defaultSorting={this.defaultSorting}
+                  tableData={this.state.cities.data}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
