@@ -2,16 +2,18 @@ import React from "react";
 import { useState } from "react";
 
 import Navigation from "./Navigation";
-import ByPopulation from "./ByPopulation";
-import Countries from "./Countries";
+import AllCities from "./AllCities";
+import AllCountries from "./AllCountries";
+import Country from "./Country";
 import Capitals from "./Capitals";
 import City from "./City";
 import Map from "./Map";
 
 const App = () => {
   const [navigation, setNavigation] = useState([
-    { name: "By Population", href: "#", current: true }, // dane wszystkich miast
-    { name: "Countries", href: "#", current: false }, // dane wszystkich miast w danym kraju
+    { name: "All Countries", href: "#", current: true }, // dane wszystkich miast
+    { name: "All Cities", href: "#", current: false }, // dane wszystkich miast
+    { name: "Country", href: "#", current: false }, // dane wszystkich miast w danym kraju
     { name: "Capitals", href: "#", current: false }, // dane wszystkich stolic
     { name: "City", href: "#", current: false }, // dane wybranego miasta
     { name: "Map", href: "#", current: false }, // mapka państw
@@ -33,10 +35,12 @@ const App = () => {
     const current = navigation.find((element) => element.current === true);
 
     switch (current.name) {
-      case "By Population":
-        return <ByPopulation />;
-      case "Countries":
-        return <Countries />;
+      case "All Cities":
+        return <AllCities />;
+      case "All Countries":
+        return <AllCountries />;
+      case "Country":
+        return <Country />;
       case "Capitals":
         return <Capitals />;
       case "City":

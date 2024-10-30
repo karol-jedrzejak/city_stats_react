@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ApiCitiesController extends AbstractController
 {
-    #[Route('/api/cities/post', methods: ['POST'], name: 'api.cities.post')]
+    #[Route('/api/cities_by_population', methods: ['POST'], name: 'api.city_by_population')]
     public function api_cities_post(Request $request): Response
     {
 
@@ -70,64 +70,45 @@ class ApiCitiesController extends AbstractController
         return $response;
     }
 
+    /////////////////////////////////////////////////////////////////////////
 
-    #[Route('/api/cities/get', methods: ['GET'], name: 'api.cities.get')]
+    #[Route('/api/countries_by_population', methods: ['GET'], name: 'api.country_by_population')]
     public function api_cities_get(): Response
     {
 
-        $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
-        $data = ['orderBy' => 'populationCounts', "order" => "asc"];
+        $population_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
+        $flags_data = file_get_contents(
+            'https://countriesnow.space/api/v0.1/countries/flag/images'
+        );
+        $position_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
 
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data),
-            ],
-        ];
+        $decoded_population_data = json_decode($population_data)->data;
+        $decoded_flags_data = json_decode($flags_data)->data;
+        $decoded_position_data = json_decode($position_data)->data;
 
-        $context = stream_context_create($options);
-        $data = file_get_contents($url, false, $context);
-        if ($data === false) {
-            /* Handle error */
-        }
+        $new_data = [];
+        $id = 1;
+        foreach ($decoded_flags_data as $item) {
+            $obj = array_column($decoded_population_data, null, 'iso3')[$item->iso3] ?? false;
+            $obj2 = array_column($decoded_position_data, null, 'iso2')[$item->iso2] ?? false;
+            if ($obj) {
+                $obj->id = $id;
+                $obj->flag = $item->flag;
 
+                $obj->population_value = (int) $obj->populationCounts[count($obj->populationCounts) - 1]->value;
+                $obj->population_year = $obj->populationCounts[count($obj->populationCounts) - 1]->year;
 
-
-
-
-
-
-
-
-
-
-
-        $decoded_data = json_decode($data);
-        $new_data = $decoded_data->data;
-
-        // Get GPS coordinates
-        $data_gps = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
-        $decoded_data_gps = json_decode($data_gps);
-
-        foreach ($new_data as $key => $item) {
-            if (is_numeric($item->populationCounts[0]->value)) {
-                $item->population_value = (int) $item->populationCounts[0]->value;
-                $item->population_year = $item->populationCounts[0]->year;
-                $item->id = $key;
-
-                $obj = array_column($decoded_data_gps->data, null, 'name')[$item->country] ?? null;
-                if ($obj) {
-                    $item->iso2 = $obj->iso2;
-                    $item->long = $obj->long;
-                    $item->lat = $obj->lat;
-                } else {
-                    $item->iso2 = "";
-                    $item->long = 0;
-                    $item->lat = 0;
+                if ($obj2) {
+                    $obj->long = $obj2->long;
+                    $obj->lat = $obj2->lat;
                 }
-            } else {
-                unset($new_data[$key]);
+                if ($item->iso2 == "GR") {
+                    $obj->long = 22;
+                    $obj->lat = 39;
+                }
+
+                $new_data[] = $obj;
+                $id++;
             }
         }
 
