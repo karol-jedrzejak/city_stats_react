@@ -86,11 +86,82 @@ class ApiCitiesController extends AbstractController
         $decoded_flags_data = json_decode($flags_data)->data;
         $decoded_position_data = json_decode($position_data)->data;
 
+        // Missing flag from api
+        $decoded_flags_data[] = (object) [
+            "name" => "Russia",
+            "flag" => "https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg",
+            "iso2" => "RU",
+            "iso3" => "RUS"
+        ];
+        $decoded_flags_data[] = (object) [
+            "name" => "Congo, The Democratic Republic of the",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg",
+            "iso2" => "CD",
+            "iso3" => "COD"
+        ];
+        $decoded_flags_data[] = (object) [
+            "name" => "Libya",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Libya.svg",
+            "iso2" => "LY",
+            "iso3" => "LBY"
+        ];
+        $decoded_flags_data[] = (object) [
+            "name" => "Bolivia",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Bolivia.svg",
+            "iso2" => "BO",
+            "iso3" => "BOL"
+        ];
+        $decoded_flags_data[] = (object) [
+            "name" => "Venezuela",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg",
+            "iso2" => "VE",
+            "iso3" => "VEN"
+        ];
+        $decoded_flags_data[] = (object) [
+            "name" => "North Korea",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg",
+            "iso2" => "KP",
+            "iso3" => "PRK"
+        ];
+        $decoded_flags_data[] = (object) [
+            "name" => "South Korea",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg",
+            "iso2" => "KR",
+            "iso3" => "KOR"
+        ];
+
         $new_data = [];
         $id = 1;
         foreach ($decoded_flags_data as $item) {
-            $obj = array_column($decoded_population_data, null, 'iso3')[$item->iso3] ?? false;
-            $obj2 = array_column($decoded_position_data, null, 'iso2')[$item->iso2] ?? false;
+
+
+
+            //wrong iso correction
+            switch ($item->iso3) {
+                    /*                 case "COG":
+                    $iso3_search = "COD";
+                    break; */
+                default:
+                    $iso3_search = $item->iso3;
+                    break;
+            }
+            $obj = array_column($decoded_population_data, null, 'iso3')[$iso3_search] ?? false;
+
+
+
+            //wrong iso correction
+            switch ($item->iso2) {
+                case "GR":
+                    $iso2_search = "EL";
+                    break;
+                default:
+                    $iso2_search = $item->iso2;
+                    break;
+            }
+            $obj2 = array_column($decoded_position_data, null, 'iso2')[$iso2_search] ?? false;
+
+
+
             if ($obj) {
                 $obj->id = $id;
                 $obj->flag = $item->flag;
@@ -102,14 +173,18 @@ class ApiCitiesController extends AbstractController
                     $obj->long = $obj2->long;
                     $obj->lat = $obj2->lat;
                 }
-                if ($item->iso2 == "GR") {
-                    $obj->long = 22;
-                    $obj->lat = 39;
-                }
 
                 $new_data[] = $obj;
                 $id++;
             }
+            /*             if ($item) {
+                if ($item->iso2 == "RU") {
+                    $obj->long = 100;
+                    $obj->lat = 60;
+                }
+                $new_data[] = $obj;
+                $id++;
+            } */
         }
 
         $data = json_encode($new_data);
