@@ -24,10 +24,11 @@ class AllCountries extends Component {
       { label: "Id", accessor: "id" },
       { label: "Country", accessor: "country" },
       { label: "Flag", accessor: "flag", formatImage: true },
-      { label: "Code", accessor: "code" },
+      { label: "ISO2 Code", accessor: "iso2" },
+      { label: "ISO3 Code", accessor: "iso3" },
       { label: "Year", accessor: "population_year" },
       {
-        label: "Value",
+        label: "Population",
         accessor: "population_value",
         formatNumber: true,
         classNames: "text-right",
@@ -55,20 +56,6 @@ class AllCountries extends Component {
 
   render() {
     const loading_countries = this.state.loading_countries;
-
-    /*     const markerBlue = new L.Icon({
-      iconUrl: require("../../public/leaflet/marker-icon-blue.png"),
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [0, -46],
-    });
-
-    const markerRed = new L.Icon({
-      iconUrl: require("../../public/leaflet/marker-icon-red.png"),
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [0, -46],
-    }); */
 
     return (
       <div className="min-h-full">
@@ -99,12 +86,6 @@ class AllCountries extends Component {
                           iconAnchor: [15, 10],
                           popupAnchor: [0, -30],
                         })
-                        /*                     new L.Icon({
-                          iconUrl: require("../../public/leaflet/marker-icon-blue.png"),
-                          iconSize: [25, 41],
-                          iconAnchor: [12, 41],
-                          popupAnchor: [0, -46],
-                        }) */
                       }
                       position={[item.lat, item.long]}
                     >

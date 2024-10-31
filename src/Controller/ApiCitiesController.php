@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ApiCitiesController extends AbstractController
 {
     #[Route('/api/cities_by_population', methods: ['POST'], name: 'api.city_by_population')]
-    public function api_cities_post(Request $request): Response
+    public function cities_by_population(Request $request): Response
     {
 
         $post_data = json_decode($request->getContent(), true);
@@ -33,13 +33,13 @@ class ApiCitiesController extends AbstractController
         }
 
         $decoded_data = json_decode($data);
-        $new_data = $decoded_data->data;
+        $cities_data = $decoded_data->data;
 
         // Get GPS coordinates
         $data_gps = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
         $decoded_data_gps = json_decode($data_gps);
 
-        foreach ($new_data as $key => $item) {
+        foreach ($cities_data as $key => $item) {
             if (is_numeric($item->populationCounts[0]->value)) {
                 $item->population_value = (int) $item->populationCounts[0]->value;
                 $item->population_year = $item->populationCounts[0]->year;
@@ -56,11 +56,11 @@ class ApiCitiesController extends AbstractController
                     $item->lat = 0;
                 }
             } else {
-                unset($new_data[$key]);
+                unset($cities_data[$key]);
             }
         }
 
-        $data = json_encode($new_data);
+        $data = json_encode($cities_data);
 
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -73,7 +73,7 @@ class ApiCitiesController extends AbstractController
     /////////////////////////////////////////////////////////////////////////
 
     #[Route('/api/countries_by_population', methods: ['GET'], name: 'api.country_by_population')]
-    public function api_cities_get(): Response
+    public function countries_by_population(): Response
     {
 
         $population_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
@@ -130,24 +130,11 @@ class ApiCitiesController extends AbstractController
             "iso3" => "KOR"
         ];
 
-        $new_data = [];
+        $cities_data = [];
         $id = 1;
         foreach ($decoded_flags_data as $item) {
 
-
-
-            //wrong iso correction
-            switch ($item->iso3) {
-                    /*                 case "COG":
-                    $iso3_search = "COD";
-                    break; */
-                default:
-                    $iso3_search = $item->iso3;
-                    break;
-            }
-            $obj = array_column($decoded_population_data, null, 'iso3')[$iso3_search] ?? false;
-
-
+            $obj = array_column($decoded_population_data, null, 'iso3')[$item->iso3] ?? false;
 
             //wrong iso correction
             switch ($item->iso2) {
@@ -160,8 +147,6 @@ class ApiCitiesController extends AbstractController
             }
             $obj2 = array_column($decoded_position_data, null, 'iso2')[$iso2_search] ?? false;
 
-
-
             if ($obj) {
                 $obj->id = $id;
                 $obj->flag = $item->flag;
@@ -172,22 +157,15 @@ class ApiCitiesController extends AbstractController
                 if ($obj2) {
                     $obj->long = $obj2->long;
                     $obj->lat = $obj2->lat;
+                    $obj->iso2 = $obj2->iso2;
                 }
 
-                $new_data[] = $obj;
+                $cities_data[] = $obj;
                 $id++;
             }
-            /*             if ($item) {
-                if ($item->iso2 == "RU") {
-                    $obj->long = 100;
-                    $obj->lat = 60;
-                }
-                $new_data[] = $obj;
-                $id++;
-            } */
         }
 
-        $data = json_encode($new_data);
+        $data = json_encode($cities_data);
 
         $response = new Response();
 
@@ -195,6 +173,89 @@ class ApiCitiesController extends AbstractController
         $response->headers->set('Access-Control-Allow-Origin', '*');
 
         $response->setContent($data);
+
+        return $response;
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////
+
+
+    #[Route('/api/country', methods: ['POST'], name: 'api.country')]
+    public function country(Request $request): Response
+    {
+
+        $post_data = json_decode($request->getContent(), true);
+
+        // Create class
+        $response_data = new \stdClass();
+        $response_data->country = new \stdClass();
+        $response_data->country->iso2 = $post_data['iso2'];
+
+        // Flag
+        $url = 'https://countriesnow.space/api/v0.1/countries/flag/images';
+        $data = ["iso2" => $response_data->country->iso2];
+
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $data = file_get_contents($url, false, $context);
+        if ($data === false) {
+        }
+
+        $decoded_data = json_decode($data);
+        $flag_data = $decoded_data->data;
+
+        $response_data->country->name = $flag_data->name;
+        $response_data->country->flag = $flag_data->flag;
+        $response_data->country->iso3 = $flag_data->iso3;
+
+
+        // Cities
+        $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
+        $data = ['orderBy' => 'populationCounts', "order" => $post_data['order'], "country" => $response_data->country->name];
+
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $data = file_get_contents($url, false, $context);
+        if ($data === false) {
+            /* Handle error */
+        }
+
+        $decoded_data = json_decode($data);
+        $cities_data = $decoded_data->data;
+
+        foreach ($cities_data as $key => $item) {
+            if (is_numeric($item->populationCounts[0]->value)) {
+                $item->population_value = (int) $item->populationCounts[0]->value;
+                $item->population_year = $item->populationCounts[0]->year;
+                $item->id = $key;
+            } else {
+                unset($cities_data[$key]);
+            }
+        }
+
+        $response_data->cities = $cities_data;
+
+        $response_data = json_encode($response_data);
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->setContent($response_data);
 
         return $response;
     }
