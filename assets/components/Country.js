@@ -38,7 +38,7 @@ class Country extends Component {
   citiesByPopulation() {
     let data = {
       order: "asc",
-      iso2: "pl",
+      iso2: "PL",
     };
 
     axios.post("http://localhost:8000/api/country", data).then((response) => {
@@ -75,6 +75,13 @@ class Country extends Component {
                   className="w-48 border border-black m-4"
                   src={this.state.country.flag}
                 />
+                {this.state.country.states.map(({ name, state_code }, key) => {
+                  return (
+                    <div key={key}>
+                      {state_code} - {name}
+                    </div>
+                  );
+                })}
                 <br />
               </div>
               <div className="p-10 w-full">

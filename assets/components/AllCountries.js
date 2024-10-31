@@ -77,8 +77,9 @@ class AllCountries extends Component {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     detectRetina="true"
                   />
-                  {this.state.countries.map((item) => (
+                  {this.state.countries.map((item, key) => (
                     <Marker
+                      key={key}
                       icon={
                         new L.Icon({
                           iconUrl: item.flag,
