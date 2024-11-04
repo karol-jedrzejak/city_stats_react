@@ -238,6 +238,34 @@ class ApiCitiesController extends AbstractController
 
         $response_data->country->states = $states_data->states;
 
+        // Population
+        $url = 'https://countriesnow.space/api/v0.1/countries/population';
+        $data = ["country" => $response_data->country->name];
+
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $data = file_get_contents($url, false, $context);
+        if ($data === false) {
+        }
+
+        $decoded_data = json_decode($data);
+        $population_data = $decoded_data->data;
+
+        $response_data->country->population_count = [];
+        $response_data->country->population_years = [];
+
+        foreach ($population_data->populationCounts as $item) {
+            $response_data->country->population_years[] = $item->year;
+            $response_data->country->population_count[] = $item->value;
+            $response_data->country->population[] = [$item->year, $item->value];
+        }
 
         // Cities
         $url = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';

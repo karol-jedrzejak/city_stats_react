@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Table from "./table/Table";
+import Loading from "./Loading";
 
 import {
   MapContainer,
@@ -58,12 +59,10 @@ class AllCountries extends Component {
     const loading_countries = this.state.loading_countries;
 
     return (
-      <div className="min-h-full">
+      <div className="min-h-full bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {loading_countries ? (
-            <div className="row text-center">
-              <span>LOADING</span>
-            </div>
+            <Loading />
           ) : (
             <div>
               <div className="p-5 w-full">

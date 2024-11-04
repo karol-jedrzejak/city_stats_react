@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Table from "./table/Table";
+import Loading from "./Loading";
 
 class AllCities extends Component {
   constructor() {
@@ -49,12 +50,10 @@ class AllCities extends Component {
   render() {
     const loading_cities = this.state.loading_cities;
     return (
-      <div className="min-h-full">
+      <div className="min-h-full bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {loading_cities ? (
-            <div className="row text-center">
-              <span>LOADING</span>
-            </div>
+            <Loading />
           ) : (
             <div>
               <div className="p-10 w-full">
