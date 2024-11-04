@@ -43,7 +43,7 @@ class Country extends Component {
   citiesByPopulation() {
     let data = {
       order: "asc",
-      iso2: "PL",
+      iso2: "US",
     };
 
     axios.post("http://localhost:8000/api/country", data).then((response) => {
@@ -75,14 +75,14 @@ class Country extends Component {
               },
             },
             title: {
-              text: "Liczba ludności [mln]",
+              text: "Population [mln]",
             },
           },
           xaxis: {
             type: "datetime",
             format: "YYYY",
             title: {
-              text: "Rok",
+              text: "Year",
             },
           },
         },
@@ -100,192 +100,119 @@ class Country extends Component {
     const loading_cities = this.state.loading_cities;
 
     return (
-      <div className="min-h-full bg-gray-50">
+      <div className="min-h-full bg-gray-50 pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {loading_cities ? (
             <Loading />
           ) : (
             <div>
-              <div className="p-10 w-full">
-                INFO:
-                <br />
-                Nazwa: {this.state.country.name}
-                <br />
-                ISO2: {this.state.country.iso2}
-                <br />
-                ISO3: {this.state.country.iso3}
-                <br />
-                Flag:{" "}
-                <img
-                  className="w-48 border border-black m-4"
-                  src={this.state.country.flag}
-                />
-                {this.state.country.states.map(({ name, state_code }, key) => {
-                  return (
-                    <div key={key}>
-                      {state_code} - {name}
-                    </div>
-                  );
-                })}
-                <br />
-              </div>
-              <div className="p-10 w-full">
-                <Table
-                  columns={this.columns_cities}
-                  defaultSorting={this.defaultSorting_cities}
-                  tableData={this.state.cities}
-                />
-              </div>
-
-              <div>
-                <Chart
-                  options={this.state.chart_options}
-                  series={this.state.chart_series}
-                  type="area"
-                  height={350}
-                />
-              </div>
-
-              <div className="bg-gray-50 py-24 sm:py-32">
+              <div className="bg-gray-50">
                 <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-                  <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
-                    <div className="relative lg:col-span-2 bg-red-600">
+                  <div className="pt-10 grid gap-4 lg:grid-cols-3 lg:grid-rows-2">
+                    <div className="relative lg:col-span-2">
                       <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
-                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
-                        <div className="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
+                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-tl-[calc(2rem+1px)]">
+                        <div className="p-8 sm:p-10">
                           <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                            INFO
+                            INFO:
                           </p>
-                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                            Nazwa: {this.state.country.name}
-                            <br />
-                            ISO2: {this.state.country.iso2}
-                            <br />
-                            ISO3: {this.state.country.iso3}
-                          </p>
-                        </div>
-                        <div className="px-8 pb-8 content-center">
-                          <img
-                            className="w-48 border border-black"
-                            src={this.state.country.flag}
-                          />
-                        </div>
-                      </div>
-                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-l-[2rem]"></div>
-                    </div>
-                    <div className="relative lg:col-span-2 bg-red-600">bbb</div>
-                    <div className="relative lg:row-span-2 lg:col-start-3 lg:row-start-1 bg-red-600">
-                      ccc
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 py-24 sm:py-32">
-                <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-                  <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
-                    <div className="relative lg:row-span-2">
-                      <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
-                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
-                        <div className="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
-                          <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                            INFO
-                          </p>
-                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                            Nazwa: {this.state.country.name}
-                            <br />
-                            ISO2: {this.state.country.iso2}
-                            <br />
-                            ISO3: {this.state.country.iso3}
-                          </p>
-                        </div>
-                        <div className="px-8 pb-8 content-center">
-                          <img
-                            className="w-48 border border-black"
-                            src={this.state.country.flag}
-                          />
-                        </div>
-                      </div>
-                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-l-[2rem]"></div>
-                    </div>
-                    <div className="relative max-lg:row-start-1">
-                      <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-t-[2rem]"></div>
-                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
-                        <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                          <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                            Performance
-                          </p>
-                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                            Lorem ipsum, dolor sit amet consectetur adipisicing
-                            elit maiores impedit.
-                          </p>
-                        </div>
-                        <div className="flex flex-1 items-center justify-center px-8 max-lg:pb-12 max-lg:pt-10 sm:px-10 lg:pb-2">
-                          <img
-                            className="w-full max-lg:max-w-xs"
-                            src="https://tailwindui.com/plus/img/component-images/bento-03-performance.png"
-                            alt=""
-                          />
-                        </div>
-                      </div>
-                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 max-lg:rounded-t-[2rem]"></div>
-                    </div>
-                    <div className="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
-                      <div className="absolute inset-px rounded-lg bg-white"></div>
-                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)]">
-                        <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                          <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                            Security
-                          </p>
-                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                            Morbi viverra dui mi arcu sed. Tellus semper
-                            adipiscing suspendisse semper morbi.
-                          </p>
-                        </div>
-                        <div className="flex flex-1 items-center [container-type:inline-size] max-lg:py-6 lg:pb-2">
-                          <img
-                            className="h-[min(152px,40cqw)] object-cover object-center"
-                            src="https://tailwindui.com/plus/img/component-images/bento-03-security.png"
-                            alt=""
-                          />
-                        </div>
-                      </div>
-                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5"></div>
-                    </div>
-                    <div className="relative lg:row-span-2">
-                      <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-b-[2rem] lg:rounded-r-[2rem]"></div>
-                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
-                        <div className="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
-                          <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                            Powerful APIs
-                          </p>
-                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                            Sit quis amet rutrum tellus ullamcorper ultricies
-                            libero dolor eget sem sodales gravida.
-                          </p>
-                        </div>
-                        <div className="relative min-h-[30rem] w-full grow">
-                          <div className="absolute bottom-0 left-10 right-0 top-10 overflow-hidden rounded-tl-xl bg-gray-900 shadow-2xl">
-                            <div className="flex bg-gray-800/40 ring-1 ring-white/5">
-                              <div className="-mb-px flex text-sm/6 font-medium text-gray-400">
-                                <div className="border-b border-r border-b-white/20 border-r-white/10 bg-white/5 px-4 py-2 text-white">
-                                  NotificationSetting.jsx
-                                </div>
-                                <div className="border-r border-gray-600/10 px-4 py-2">
-                                  App.jsx
-                                </div>
-                              </div>
+                          <div className="mt-2 text-gray-600 flex justify-center items-center">
+                            <div className="flex-none w-48">
+                              <table>
+                                <tr>
+                                  <td className="p-4">Nazwa:</td>
+                                  <td className="p-4">
+                                    {this.state.country.name}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td className="p-4">ISO2:</td>
+                                  <td className="p-4">
+                                    {this.state.country.iso2}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td className="p-4">iso3:</td>
+                                  <td className="p-4">
+                                    {this.state.country.iso3}
+                                  </td>
+                                </tr>
+                              </table>
                             </div>
-                            <div className="px-6 pb-14 pt-6">
-                              {/* Your code example */}
+                            <div className="p-8">
+                              <img
+                                className="w-fit border border-black"
+                                src={this.state.country.flag}
+                              />
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 max-lg:rounded-b-[2rem] lg:rounded-r-[2rem]"></div>
+                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-tl-[2rem]"></div>
+                    </div>
+                    {/* ///////////////////// */}
+                    <div className="relative lg:col-span-2">
+                      <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-bl-[calc(2rem+1px)]">
+                        <div className="p-8 sm:p-10">
+                          <p className="mt-2 mb-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                            POPULATION:
+                          </p>
+                          <Chart
+                            options={this.state.chart_options}
+                            series={this.state.chart_series}
+                            type="area"
+                            height={350}
+                          />
+                        </div>
+                      </div>
+                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-bl-[2rem]"></div>
+                    </div>
+                    {/* ///////////////////// */}
+                    <div className="relative lg:row-span-2 lg:col-start-3 lg:row-start-1">
+                      <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                      <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-r-[calc(2rem+1px)]">
+                        <div className="p-8 sm:p-10">
+                          <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                            STATES:
+                          </p>
+                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
+                            {this.state.country.states.map(
+                              ({ name, state_code }, key) => {
+                                return (
+                                  <div key={key}>
+                                    - {state_code} - {name}
+                                  </div>
+                                );
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-r-[2rem]"></div>
                     </div>
                   </div>
                 </div>
+                {/* ///////////////////// */}
+                <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+                  <div className="p-10 relative">
+                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                    <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
+                      <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                        CITIES:
+                      </p>
+                      <div className="m-5">
+                        <Table
+                          columns={this.columns_cities}
+                          defaultSorting={this.defaultSorting_cities}
+                          tableData={this.state.cities}
+                        />
+                      </div>
+                    </div>
+                    <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>
+                  </div>
+                </div>
+                {/* ///////////////////// */}
               </div>
             </div>
           )}

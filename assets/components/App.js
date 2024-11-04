@@ -59,8 +59,7 @@ const App = () => {
         setNavigation={setNavigation}
         changeCurrent={changeCurrent}
       />
-      {/* <AllCities /> */}
-      <div>{project()}</div>
+      <div className="bg-gray-50">{project()}</div>
     </div>
   );
 };

@@ -50,18 +50,29 @@ class AllCities extends Component {
   render() {
     const loading_cities = this.state.loading_cities;
     return (
-      <div className="min-h-full bg-gray-50">
+      <div className="min-h-full bg-gray-50 pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {loading_cities ? (
             <Loading />
           ) : (
             <div>
-              <div className="p-10 w-full">
-                <Table
-                  columns={this.columns_cities}
-                  defaultSorting={this.defaultSorting_cities}
-                  tableData={this.state.cities.data}
-                />
+              <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+                <div className="p-10 relative">
+                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                  <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
+                    <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                      ALL CITIES:
+                    </p>
+                    <div className="m-5">
+                      <Table
+                        columns={this.columns_cities}
+                        defaultSorting={this.defaultSorting_cities}
+                        tableData={this.state.cities.data}
+                      />
+                    </div>
+                  </div>
+                  <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>
+                </div>
               </div>
             </div>
           )}
