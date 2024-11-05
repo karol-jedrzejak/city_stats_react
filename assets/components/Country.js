@@ -10,7 +10,7 @@ class Country extends Component {
     this.state = {
       cities: {},
       loading_cities: true,
-      sorting: "asc",
+      sorting: "dsc",
       country: {},
 
       chart_options: {},
@@ -31,7 +31,7 @@ class Country extends Component {
 
     this.defaultSorting_cities = {
       accessor: "population_value",
-      direction: "asc",
+      direction: "dsc",
     };
   }
 
@@ -42,14 +42,16 @@ class Country extends Component {
   // post
   citiesByPopulation() {
     let data = {
-      order: "asc",
-      iso2: "US",
+      order: "dsc",
+      iso2: this.props.currentCountry,
     };
 
     axios.post("http://localhost:8000/api/country", data).then((response) => {
-      response.data.country.population.forEach((element) => {
-        element[0] = new Date(element[0], 1, 1);
-      });
+      if (response.data.country.population) {
+        response.data.country.population.forEach((element) => {
+          element[0] = new Date(element[0], 1, 1);
+        });
+      }
 
       this.setState({
         cities: response.data.cities,
@@ -98,6 +100,17 @@ class Country extends Component {
 
   render() {
     const loading_cities = this.state.loading_cities;
+    /* 
+    function population() {
+      return (
+        <Chart
+          options={this.state.chart_options}
+          series={this.state.chart_series}
+          type="area"
+          height={350}
+        />
+      );
+    } */
 
     return (
       <div className="min-h-full bg-gray-50 pb-10">
@@ -119,24 +132,26 @@ class Country extends Component {
                           <div className="mt-2 text-gray-600 flex justify-center items-center">
                             <div className="flex-none w-48">
                               <table>
-                                <tr>
-                                  <td className="p-4">Nazwa:</td>
-                                  <td className="p-4">
-                                    {this.state.country.name}
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="p-4">ISO2:</td>
-                                  <td className="p-4">
-                                    {this.state.country.iso2}
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="p-4">iso3:</td>
-                                  <td className="p-4">
-                                    {this.state.country.iso3}
-                                  </td>
-                                </tr>
+                                <tbody>
+                                  <tr>
+                                    <td className="p-4">Nazwa:</td>
+                                    <td className="p-4">
+                                      {this.state.country.name}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">ISO2:</td>
+                                    <td className="p-4">
+                                      {this.state.country.iso2}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">iso3:</td>
+                                    <td className="p-4">
+                                      {this.state.country.iso3}
+                                    </td>
+                                  </tr>
+                                </tbody>
                               </table>
                             </div>
                             <div className="p-8">
@@ -158,12 +173,18 @@ class Country extends Component {
                           <p className="mt-2 mb-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                             POPULATION:
                           </p>
-                          <Chart
-                            options={this.state.chart_options}
-                            series={this.state.chart_series}
-                            type="area"
-                            height={350}
-                          />
+                          <div>
+                            {this.state.country.population ? (
+                              <Chart
+                                options={this.state.chart_options}
+                                series={this.state.chart_series}
+                                type="area"
+                                height={350}
+                              />
+                            ) : (
+                              <div>Missing Data in Supplier Api</div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-bl-[2rem]"></div>
@@ -176,17 +197,23 @@ class Country extends Component {
                           <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                             STATES:
                           </p>
-                          <p className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
-                            {this.state.country.states.map(
-                              ({ name, state_code }, key) => {
-                                return (
-                                  <div key={key}>
-                                    - {state_code} - {name}
-                                  </div>
-                                );
-                              }
+                          <div className="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">
+                            {this.state.country.states ? (
+                              <div>
+                                {this.state.country.states.map(
+                                  ({ name, state_code }, key) => {
+                                    return (
+                                      <div key={key}>
+                                        - {state_code} - {name}
+                                      </div>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            ) : (
+                              <div>Missing Data in Supplier Api</div>
                             )}
-                          </p>
+                          </div>
                         </div>
                       </div>
                       <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-r-[2rem]"></div>
@@ -202,11 +229,16 @@ class Country extends Component {
                         CITIES:
                       </p>
                       <div className="m-5">
-                        <Table
-                          columns={this.columns_cities}
-                          defaultSorting={this.defaultSorting_cities}
-                          tableData={this.state.cities}
-                        />
+                        {this.state.cities ? (
+                          <Table
+                            changeCurrent={this.props.changeCurrent}
+                            columns={this.columns_cities}
+                            defaultSorting={this.defaultSorting_cities}
+                            tableData={this.state.cities}
+                          />
+                        ) : (
+                          <div>Missing Data in Supplier Api</div>
+                        )}
                       </div>
                     </div>
                     <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>

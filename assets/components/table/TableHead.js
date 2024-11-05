@@ -5,8 +5,7 @@ const TableHead = ({ columns, handleSorting, defaultSorting }) => {
   const [order, setOrder] = useState("asc");
 
   const handleSortingChange = (accessor) => {
-    const sortOrder =
-      accessor === sortField && order === "asc" ? "desc" : "asc";
+    const sortOrder = accessor === sortField && order === "asc" ? "dsc" : "asc";
     setSortField(accessor);
     setOrder(sortOrder);
     handleSorting(accessor, sortOrder);
@@ -42,10 +41,10 @@ const TableHead = ({ columns, handleSorting, defaultSorting }) => {
           }
 
           if (
-            (sortField === accessor && order === "desc") ||
+            (sortField === accessor && order === "dsc") ||
             (sortField === "" &&
               defaultSorting.accessor === accessor &&
-              defaultSorting.direction === "desc")
+              defaultSorting.direction === "dsc")
           ) {
             arrow = (
               <svg

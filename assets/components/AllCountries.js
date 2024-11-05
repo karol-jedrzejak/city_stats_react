@@ -23,7 +23,13 @@ class AllCountries extends Component {
 
     this.columns_countries = [
       { label: "Id", accessor: "id" },
-      { label: "Country", accessor: "country" },
+      {
+        label: "Country",
+        accessor: "country",
+        link: true,
+        link_accessor: "iso2",
+        classNames: "cursor-pointer",
+      },
       { label: "Flag", accessor: "flag", formatImage: true },
       { label: "ISO2 Code", accessor: "iso2" },
       { label: "ISO3 Code", accessor: "iso3" },
@@ -125,6 +131,7 @@ class AllCountries extends Component {
                     </p>
                     <div className="m-5">
                       <Table
+                        changeCurrent={this.props.changeCurrent}
                         columns={this.columns_countries}
                         defaultSorting={this.defaultSorting_countries}
                         tableData={this.state.countries}

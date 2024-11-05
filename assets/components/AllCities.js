@@ -9,7 +9,7 @@ class AllCities extends Component {
     this.state = {
       cities: {},
       loading_cities: true,
-      sorting: "asc",
+      sorting: "dsc",
     };
 
     this.columns_cities = [
@@ -26,7 +26,7 @@ class AllCities extends Component {
 
     this.defaultSorting_cities = {
       accessor: "population_value",
-      direction: "asc",
+      direction: "dsc",
     };
   }
 
@@ -37,7 +37,7 @@ class AllCities extends Component {
   // post
   citiesByPopulation() {
     let data = {
-      order: "asc",
+      order: "dsc",
     };
 
     axios
@@ -65,6 +65,7 @@ class AllCities extends Component {
                     </p>
                     <div className="m-5">
                       <Table
+                        changeCurrent={this.props.changeCurrent}
                         columns={this.columns_cities}
                         defaultSorting={this.defaultSorting_cities}
                         tableData={this.state.cities.data}

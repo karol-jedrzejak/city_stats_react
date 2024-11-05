@@ -1,11 +1,18 @@
-const TableBody = ({ tableData, columns }) => {
+const TableBody = ({ tableData, columns, changeCurrent }) => {
   return (
     <tbody>
       {tableData.map((data) => {
         return (
           <tr key={data.id} className="even:bg-gray-50 odd:bg-white border-b">
             {columns.map(
-              ({ accessor, formatImage, formatNumber, classNames }) => {
+              ({
+                accessor,
+                formatImage,
+                formatNumber,
+                classNames,
+                link,
+                link_accessor,
+              }) => {
                 const tData = data[accessor] ? data[accessor] : "——";
 
                 let tData2 = formatImage ? (
@@ -18,8 +25,17 @@ const TableBody = ({ tableData, columns }) => {
                   ? Intl.NumberFormat().format(tData2)
                   : tData2;
 
+                function click() {
+                  // it will not print the value
+                  changeCurrent("Country", data[link_accessor]);
+                }
+
                 return (
-                  <td key={accessor} className={classNames}>
+                  <td
+                    key={accessor}
+                    className={classNames}
+                    onClick={link ? click : undefined}
+                  >
                     {tData2}
                   </td>
                 );

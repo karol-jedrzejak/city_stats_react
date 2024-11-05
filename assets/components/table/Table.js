@@ -26,7 +26,11 @@ const Table = (props) => {
           handleSorting={handleSorting}
           defaultSorting={props.defaultSorting}
         />
-        <TableBody columns={props.columns} tableData={tableData} />
+        <TableBody
+          columns={props.columns}
+          tableData={tableData}
+          changeCurrent={props.changeCurrent}
+        />
       </table>
     </>
   );

@@ -19,7 +19,9 @@ const App = () => {
     { name: "Map", href: "#", current: false }, // mapka państw
   ]);
 
-  const changeCurrent = (current) => {
+  const [currentCountry, setCurrentCountry] = useState("PL");
+
+  const changeCurrent = (current, country = null, city = null) => {
     const changedNavigation = [...navigation];
     changedNavigation.forEach((element) => {
       if (element.name === current) {
@@ -28,6 +30,9 @@ const App = () => {
         element.current = false;
       }
     });
+    if (country) {
+      setCurrentCountry(country);
+    }
     setNavigation(changedNavigation);
   };
 
@@ -36,11 +41,16 @@ const App = () => {
 
     switch (current.name) {
       case "All Cities":
-        return <AllCities />;
+        return <AllCities changeCurrent={changeCurrent} />;
       case "All Countries":
-        return <AllCountries />;
+        return <AllCountries changeCurrent={changeCurrent} />;
       case "Country":
-        return <Country />;
+        return (
+          <Country
+            changeCurrent={changeCurrent}
+            currentCountry={currentCountry}
+          />
+        );
       case "Capitals":
         return <Capitals />;
       case "City":
