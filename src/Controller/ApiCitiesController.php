@@ -129,6 +129,12 @@ class ApiCitiesController extends AbstractController
             "iso2" => "KR",
             "iso3" => "KOR"
         ];
+        $decoded_flags_data[] = (object) [
+            "name" => "Ivory Coast",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg",
+            "iso2" => "CI",
+            "iso3" => "CIV"
+        ];
 
         // Extract quantities into a separate array
         $names = array_map(function ($item) {
@@ -190,14 +196,14 @@ class ApiCitiesController extends AbstractController
     /////////////////////////////////////////////////////////////////////////
 
 
-    //#[Route('/api/country', methods: ['post'], name: 'api.country')]
-    #[Route('/api/country', methods: ['get'], name: 'api.country')]
+    #[Route('/api/country', methods: ['post'], name: 'api.country')]
+    //#[Route('/api/country', methods: ['get'], name: 'api.country')]
     public function country(Request $request): Response
     {
 
-        //$post_data = json_decode($request->getContent(), true);
-        $post_data['iso2'] = "KR";
-        $post_data['order'] = "asc";
+        $post_data = json_decode($request->getContent(), true);
+        //$post_data['iso2'] = "KR";
+        //$post_data['order'] = "asc";
 
         // Create class
         $response_data = new \stdClass();
@@ -266,9 +272,16 @@ class ApiCitiesController extends AbstractController
                 case "KR":
                     $response_data->country->name = "South Korea";
                     $response_data->country->name_alt = "Korea, Rep.";
-                    $response_data->country->name_ll = null;
+                    $response_data->country->name_ll = "Republic of Korea";
                     $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg";
                     $response_data->country->iso3 = "KOR";
+                    break;
+                case "CI":
+                    $response_data->country->name = "Ivory Coast";
+                    $response_data->country->name_alt = "Côte d'Ivoire";
+                    $response_data->country->name_ll = null;
+                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg";
+                    $response_data->country->iso3 = "CIV";
                     break;
                 default:
                     $response_data->country->name = null;
@@ -297,6 +310,26 @@ class ApiCitiesController extends AbstractController
             case 'Congo':
                 $response_data->country->name_alt = "Congo Rep.";
                 $response_data->country->name_ll = "Congo, Rep.";
+                break;
+            case 'Hong Kong':
+                $response_data->country->name_alt = "China, Hong Kong SAR";
+                $response_data->country->name_ll = "Hong Kong SAR, China";
+                break;
+            case 'Iran, Islamic Rep.':
+                $response_data->country->name_alt = "Iran (Islamic Republic of)";
+                $response_data->country->name_ll = "Iran";
+                break;
+            case 'Sudan':
+                $response_data->country->name_alt = "Republic of South Sudan";
+                break;
+            case 'United Kingdom':
+                $response_data->country->name_alt = "United Kingdom of Great Britain and Northern Ireland";
+                break;
+            case 'Tanzania':
+                $response_data->country->name_alt = "United Republic of Tanzania";
+                break;
+            case 'United States':
+                $response_data->country->name_alt = "United States of America";
                 break;
             default:
                 break;
@@ -423,20 +456,6 @@ class ApiCitiesController extends AbstractController
             $data = @file_get_contents($url_cities, false, $context_alt);
         }
 
-        // third attempt - diffrent name
-        if ($data === false && $response_data->country->name_ll) {
-            $data_ll = ['orderBy' => 'populationCounts', "order" => $post_data['order'], "country" => $response_data->country->name_ll];
-            $options_ll = [
-                'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method' => 'POST',
-                    'content' => http_build_query($data_ll),
-                ],
-            ];
-            $context_ll = stream_context_create($options_ll);
-            $data = @file_get_contents($url_cities, false, $context_ll);
-        }
-
         if ($data === false) {
             $url_ll = 'https://countriesnow.space/api/v0.1/countries/population/cities/filter';
             $data_ll = ['orderBy' => 'populationCounts', "order" => $post_data['order']];
@@ -454,18 +473,20 @@ class ApiCitiesController extends AbstractController
             $decoded_data_ll = json_decode($data_ll);
             $cities_data = $decoded_data_ll->data;
 
-            $obj = array_column($cities_data, null, 'country')[$response_data->country->name] ?? false;
-            if (!$obj) {
-                $obj = array_column($decoded_data_ll, null, 'country')[$response_data->country->name_alt] ?? false;
+            $array_of_cities = [];
+            foreach ($cities_data as $item) {
+                if (
+                    $item->country == $response_data->country->name ||
+                    $item->country == $response_data->country->name_alt ||
+                    $item->country == $response_data->country->name_ll
+                ) {
+                    $array_of_cities[] = $item;
+                }
             }
-            if (!$obj) {
-                $obj = array_column($decoded_data_ll, null, 'country')[$response_data->country->name_ll] ?? false;
-            }
-            dd($obj);
 
-            if ($obj) {
+            if (!empty($array_of_cities)) {
                 $transf = new \stdClass();
-                $transf->data = $obj;
+                $transf->data = $array_of_cities;
                 $data = json_encode($transf);
             }
         }
