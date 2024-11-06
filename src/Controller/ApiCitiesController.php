@@ -166,6 +166,16 @@ class ApiCitiesController extends AbstractController
         $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
         $response_data->country->currency = $retrived_data ? $retrived_data->currency : null;
 
+        // Dial Code
+        $url = "https://countriesnow.space/api/v0.1/countries/codes";
+        $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
+        $response_data->country->dial_code = $retrived_data ? $retrived_data->dial_code : null;
+
+        // Unicode Flag
+        $url = "https://countriesnow.space/api/v0.1/countries/flag/unicode";
+        $retrived_data = $this->retrive_country_property($response_data->country, $url, $url, 'iso2');
+        $response_data->country->unicodeFlag = $retrived_data ? $retrived_data->unicodeFlag : null;
+
         // Population
         $url = "https://countriesnow.space/api/v0.1/countries/population";
         $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
@@ -245,10 +255,66 @@ class ApiCitiesController extends AbstractController
             }
         }
 
+        /* 
+        if ($data != false) {
+            $url = 'https: //countriesnow.space/api/v0.1/countries/cities';
+            $retrived_data = $this->retrive_country_property($response_data->country, $url, null, 'country');
+            if ($retrived_data) {
+
+                $city_array = [];
+                foreach ($retrived_data as $city) {
+                    $transf = new \stdClass();
+                    $transf->city = $city;
+                    $transf->country = $response_data->country->name;
+                    $transf->populationCounts = [
+                        "year" => "2000",
+                        "value" => "0",
+                        "sex" => "Both Sexes",
+                        "reliabilty" => "Final figure, complete"
+                    ];
+                    $city_array[] = $transf;
+                }
+                $data = json_encode($transf);
+            }
+        } */
+
 
         if ($data != false) {
             $decoded_data = json_decode($data);
             $cities_data = $decoded_data->data;
+
+            // Add states info to cities - discarded becouse to slow - wrongly constructed supplier api
+            /*             foreach ($cities_data as $city) {
+                $city->state = null;
+            }
+
+            if ($response_data->country->states != null) {
+                foreach ($response_data->country->states as $state) {
+                    $url = 'https://countriesnow.space/api/v0.1/countries/state/cities';
+                    $data = ['state' => $state, "country" => $response_data->country->name];
+
+                    $options = [
+                        'http' => [
+                            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                            'method' => 'POST',
+                            'content' => http_build_query($data),
+                        ],
+                    ];
+
+                    $context = stream_context_create($options);
+                    $data = @file_get_contents($url, false, $context);
+
+                    if ($data != false) {
+                        foreach ($cities_data as $city) {
+                            if (in_array($city->city, $data)) {
+                                $city->state = $state;
+                            }
+                        }
+                    }
+                }
+            } */
+
+            //////////////
 
             foreach ($cities_data as $key => $item) {
                 if (is_numeric($item->populationCounts[0]->value)) {
@@ -279,67 +345,54 @@ class ApiCitiesController extends AbstractController
 
     /////////////////////////////////////////////////////////////////////////
 
-    public function retrive_country_property($country, $url_single, $url_all)
+    public function retrive_country_property($country, $url_single, $url_all, $accesor = "country")
     {
-        $data = ["country" => $country->name];
+        switch ($accesor) {
+            case 'iso2':
+                $data_arrays = [["iso2" => $country->iso2]];
+                break;
 
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data),
-            ],
-        ];
-
-        $context = stream_context_create($options);
-        $data = @file_get_contents($url_single, false, $context);
-
-        if ($data === false) {
-            $data = ["country" => $country->name_2];
-
-            $options = [
-                'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method' => 'POST',
-                    'content' => http_build_query($data),
-                ],
-            ];
-
-            $context = stream_context_create($options);
-            $data = @file_get_contents($url_single, false, $context);
+            default:
+                $data_arrays = [["country" => $country->name], ["country" => $country->name_2], ["country" => $country->name_3]];
+                break;
         }
 
-        if ($data === false) {
-            $data = ["country" => $country->name_3];
+        $data = false;
 
-            $options = [
-                'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method' => 'POST',
-                    'content' => http_build_query($data),
-                ],
-            ];
+        foreach ($data_arrays as $data_array) {
+            if ($data === false) {
+                $options = [
+                    'http' => [
+                        'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method' => 'POST',
+                        'content' => http_build_query($data_array),
+                    ],
+                ];
 
-            $context = stream_context_create($options);
-            $data = @file_get_contents($url_single, false, $context);
+                $context = stream_context_create($options);
+                $data = @file_get_contents($url_single, false, $context);
+            }
         }
 
-        if ($data === false) {
+        if ($data === false && $url_all) {
             $data = file_get_contents($url_all);
             $decoded_data = json_decode($data)->data;
-            $obj = array_column($decoded_data, null, 'iso2')[$country->iso2] ?? false;
-            if (!$obj) {
-                $obj = array_column($decoded_data, null, 'iso3')[$country->iso3] ?? false;
+
+            $search_array = [
+                ["name" => 'iso2', "value" => $country->iso2],
+                ["name" => 'iso3', "value" => $country->iso3],
+                ["name" => 'name', "value" => $country->name],
+                ["name" => 'name_2', "value" => $country->name_2],
+                ["name" => 'name_3', "value" => $country->name_3],
+            ];
+
+            $obj = null;
+            foreach ($search_array as $search) {
+                if (!$obj) {
+                    $obj = array_column($decoded_data, null, $search['name'])[$search['value']] ?? false;
+                }
             }
-            if (!$obj) {
-                $obj = array_column($decoded_data, null, 'name')[$country->name] ?? false;
-            }
-            if (!$obj) {
-                $obj = array_column($decoded_data, null, 'name_2')[$country->name_2] ?? false;
-            }
-            if (!$obj) {
-                $obj = array_column($decoded_data, null, 'name_3')[$country->name_3] ?? false;
-            }
+
             if ($obj) {
                 $transf = new \stdClass();
                 $transf->data = $obj;

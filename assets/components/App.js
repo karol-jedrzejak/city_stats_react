@@ -34,6 +34,7 @@ const App = () => {
       setCurrentCountry(country);
     }
     setNavigation(changedNavigation);
+    window.scrollTo(0, 0);
   };
 
   const project = () => {

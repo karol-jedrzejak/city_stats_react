@@ -164,6 +164,18 @@ class Country extends Component {
                                       {this.state.country.iso3}
                                     </td>
                                   </tr>
+                                  <tr>
+                                    <td className="p-4">Unicode Flag:</td>
+                                    <td className="p-4">
+                                      {this.state.country.unicodeFlag}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">Dial Code:</td>
+                                    <td className="p-4">
+                                      {this.state.country.dial_code}
+                                    </td>
+                                  </tr>
                                 </tbody>
                               </table>
                             </div>
