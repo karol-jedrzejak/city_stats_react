@@ -135,6 +135,12 @@ class ApiCitiesController extends AbstractController
             "iso2" => "CI",
             "iso3" => "CIV"
         ];
+        $decoded_flags_data[] = (object) [
+            "name" => "Tanzania",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tanzania.svg",
+            "iso2" => "TZ",
+            "iso3" => "TZA"
+        ];
 
         // Extract quantities into a separate array
         $names = array_map(function ($item) {
@@ -173,6 +179,10 @@ class ApiCitiesController extends AbstractController
                     $obj->long = $obj2->long;
                     $obj->lat = $obj2->lat;
                     $obj->iso2 = $obj2->iso2;
+                }
+
+                if ($obj->country == "Cote d'Ivoire") {
+                    $obj->country = "Ivory Coast";
                 }
 
                 $cities_data[] = $obj;
@@ -279,9 +289,16 @@ class ApiCitiesController extends AbstractController
                 case "CI":
                     $response_data->country->name = "Ivory Coast";
                     $response_data->country->name_alt = "Côte d'Ivoire";
-                    $response_data->country->name_ll = null;
+                    $response_data->country->name_ll = "Cote d'Ivoire";
                     $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg";
                     $response_data->country->iso3 = "CIV";
+                    break;
+                case "TZ":
+                    $response_data->country->name = "Tanzania";
+                    $response_data->country->name_alt = "United Republic of Tanzania";
+                    $response_data->country->name_ll = null;
+                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tanzania.svg";
+                    $response_data->country->iso3 = "TZA";
                     break;
                 default:
                     $response_data->country->name = null;
@@ -330,6 +347,9 @@ class ApiCitiesController extends AbstractController
                 break;
             case 'United States':
                 $response_data->country->name_alt = "United States of America";
+                break;
+            case 'Yemen':
+                $response_data->country->name_alt = "Yemen, Rep.";
                 break;
             default:
                 break;
