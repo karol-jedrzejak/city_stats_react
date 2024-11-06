@@ -194,18 +194,26 @@ class Country extends Component {
                                     {this.state.country.name}
                                   </td>
                                 </tr>
-                                <tr>
-                                  <td className="p-2">Alt. Name:</td>
-                                  <td className="p-2">
-                                    {this.state.country.name_2}
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="p-2">Alt. Name 2:</td>
-                                  <td className="p-2">
-                                    {this.state.country.name_3}
-                                  </td>
-                                </tr>
+                                {this.state.country.name_2 ? (
+                                  <tr>
+                                    <td className="p-2">Alt. Name:</td>
+                                    <td className="p-2">
+                                      {this.state.country.name_2}
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  ""
+                                )}
+                                {this.state.country.name_3 ? (
+                                  <tr>
+                                    <td className="p-2">Alt. Name 2:</td>
+                                    <td className="p-2">
+                                      {this.state.country.name_3}
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  ""
+                                )}
                                 <tr>
                                   <td className="p-2">Capital:</td>
                                   <td className="p-2">
@@ -370,7 +378,7 @@ class Country extends Component {
                               ({ name, state_code }, key) => {
                                 return (
                                   <div key={key}>
-                                    - {state_code} - {name}
+                                    - {name} [{state_code}]
                                   </div>
                                 );
                               }

@@ -130,6 +130,28 @@ class ApiCitiesController extends AbstractController
         return $response;
     }
 
+    /////////////////////////////////////////////////////////////////////////
+
+    #[Route('/api/world_population', methods: ['GET'], name: 'api.world_population')]
+    public function world_population(): Response
+    {
+
+        $population_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
+        $decoded_population_data = json_decode($population_data)->data;
+
+        $obj = array_column($decoded_population_data, null, 'country')["World"] ?? false;
+        $data = json_encode($obj->populationCounts);
+
+        $response = new Response();
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        $response->setContent($data);
+
+        return $response;
+    }
+
 
     /////////////////////////////////////////////////////////////////////////
 

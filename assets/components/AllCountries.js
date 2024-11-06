@@ -86,6 +86,7 @@ class AllCountries extends Component {
           ) : (
             <div>
               <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+                {/* MAP */}
                 <div className="p-10 relative">
                   <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
@@ -154,6 +155,18 @@ class AllCountries extends Component {
                   </div>
                   <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>
                 </div>
+                {/* Population */}
+                <div className="p-10 relative">
+                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                  <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
+                    <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                      Population:
+                    </p>
+                    <div className="m-5">sdas</div>
+                  </div>
+                  <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>
+                </div>
+                {/* Countries */}
                 <div className="mt-10 p-10 relative">
                   <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
