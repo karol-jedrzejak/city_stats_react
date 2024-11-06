@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import Table from "./table/Table";
 import Loading from "./Loading";
+import Chart from "react-apexcharts";
 
 import {
   MapContainer,
@@ -17,6 +18,8 @@ class AllCountries extends Component {
     super();
     this.state = {
       countries: {},
+      world_population_options: {},
+      world_population_series: [],
       loading_countries: true,
       sorting: "asc",
     };
@@ -63,10 +66,61 @@ class AllCountries extends Component {
   }
 
   componentDidMount() {
+    this.getWorldPopulation();
     this.countriesByPopulation();
   }
 
-  // get
+  // get world population
+  getWorldPopulation() {
+    axios.get(`http://localhost:8000/api/world_population`).then((response) => {
+      let population = [];
+      response.data.forEach((element) => {
+        population.push([new Date(element.year, 1, 1), element.value]);
+      });
+
+      this.setState({
+        world_population_options: {
+          chart: {
+            type: "area",
+            zoom: {
+              autoScaleYaxis: true,
+            },
+          },
+          stroke: {
+            curve: "smooth",
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          yaxis: {
+            labels: {
+              formatter: function (val) {
+                return (val / 1000000).toFixed(2);
+              },
+            },
+            title: {
+              text: "Population [mln]",
+            },
+          },
+          xaxis: {
+            type: "datetime",
+            format: "YYYY",
+            title: {
+              text: "Year",
+            },
+          },
+        },
+        world_population_series: [
+          {
+            name: "Population [mln]",
+            data: population,
+          },
+        ],
+      });
+    });
+  }
+
+  // get countires
   countriesByPopulation() {
     axios
       .get(`http://localhost:8000/api/countries_by_population`)
@@ -162,7 +216,18 @@ class AllCountries extends Component {
                     <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                       Population:
                     </p>
-                    <div className="m-5">sdas</div>
+                    <div>
+                      {this.state.world_population_series ? (
+                        <Chart
+                          options={this.state.world_population_options}
+                          series={this.state.world_population_series}
+                          type="area"
+                          height={350}
+                        />
+                      ) : (
+                        <div>Missing Data in Supplier Api</div>
+                      )}
+                    </div>
                   </div>
                   <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>
                 </div>
