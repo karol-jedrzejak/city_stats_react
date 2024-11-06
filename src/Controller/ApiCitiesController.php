@@ -77,79 +77,12 @@ class ApiCitiesController extends AbstractController
     {
 
         $population_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
-        $flags_data = file_get_contents(
-            'https://countriesnow.space/api/v0.1/countries/flag/images'
-        );
         $position_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
 
         $decoded_population_data = json_decode($population_data)->data;
-        $decoded_flags_data = json_decode($flags_data)->data;
         $decoded_position_data = json_decode($position_data)->data;
 
-        // Missing flag from api
-        $decoded_flags_data[] = (object) [
-            "name" => "Russia",
-            "flag" => "https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg",
-            "iso2" => "RU",
-            "iso3" => "RUS"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "Congo, The Democratic Republic of the",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg",
-            "iso2" => "CD",
-            "iso3" => "COD"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "Libya",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Libya.svg",
-            "iso2" => "LY",
-            "iso3" => "LBY"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "Bolivia",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Bolivia.svg",
-            "iso2" => "BO",
-            "iso3" => "BOL"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "Venezuela",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg",
-            "iso2" => "VE",
-            "iso3" => "VEN"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "North Korea",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg",
-            "iso2" => "KP",
-            "iso3" => "PRK"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "South Korea",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg",
-            "iso2" => "KR",
-            "iso3" => "KOR"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "Ivory Coast",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg",
-            "iso2" => "CI",
-            "iso3" => "CIV"
-        ];
-        $decoded_flags_data[] = (object) [
-            "name" => "Tanzania",
-            "flag" => "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tanzania.svg",
-            "iso2" => "TZ",
-            "iso3" => "TZA"
-        ];
-
-        // Extract quantities into a separate array
-        $names = array_map(function ($item) {
-            return $item->name;
-        }, $decoded_flags_data);
-
-        // Sort the original array based on the quantities
-        array_multisort($names, SORT_ASC, $decoded_flags_data);
-
+        $decoded_flags_data = $this->get_countries();
 
         $cities_data = [];
         $id = 1;
@@ -169,23 +102,18 @@ class ApiCitiesController extends AbstractController
             $obj2 = array_column($decoded_position_data, null, 'iso2')[$iso2_search] ?? false;
 
             if ($obj) {
-                $obj->id = $id;
-                $obj->flag = $item->flag;
+                $item->populationCounts = $obj->populationCounts;
+                $item->id = $id;
 
-                $obj->population_value = (int) $obj->populationCounts[count($obj->populationCounts) - 1]->value;
-                $obj->population_year = $obj->populationCounts[count($obj->populationCounts) - 1]->year;
+                $item->population_value = (int) $item->populationCounts[count($item->populationCounts) - 1]->value;
+                $item->population_year = $item->populationCounts[count($item->populationCounts) - 1]->year;
 
                 if ($obj2) {
-                    $obj->long = $obj2->long;
-                    $obj->lat = $obj2->lat;
-                    $obj->iso2 = $obj2->iso2;
+                    $item->long = $obj2->long;
+                    $item->lat = $obj2->lat;
                 }
 
-                if ($obj->country == "Cote d'Ivoire") {
-                    $obj->country = "Ivory Coast";
-                }
-
-                $cities_data[] = $obj;
+                $cities_data[] = $item;
                 $id++;
             }
         }
@@ -205,242 +133,48 @@ class ApiCitiesController extends AbstractController
 
     /////////////////////////////////////////////////////////////////////////
 
-
-    #[Route('/api/country', methods: ['post'], name: 'api.country')]
-    //#[Route('/api/country', methods: ['get'], name: 'api.country')]
+    /* 
+    #[Route('/api/country', methods: ['get'], name: 'api.country')]
     public function country(Request $request): Response
     {
+    $post_data['iso2'] = "KR";
+    $post_data['order'] = "asc";
 
+ */
+
+    #[Route('/api/country', methods: ['post'], name: 'api.country')]
+    public function country(Request $request): Response
+    {
         $post_data = json_decode($request->getContent(), true);
-        //$post_data['iso2'] = "KR";
-        //$post_data['order'] = "asc";
 
-        // Create class
+        // Create response class
         $response_data = new \stdClass();
-        $response_data->country = new \stdClass();
-        $response_data->country->iso2 = $post_data['iso2'];
-
-        // Flag
-        $url = 'https://countriesnow.space/api/v0.1/countries/flag/images';
-        $data = ["iso2" => $response_data->country->iso2];
-
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data),
-            ],
-        ];
-
-        $context = stream_context_create($options);
-        $data = @file_get_contents($url, false, $context);
-        if ($data === false) {
-            // Fixing missing data
-            switch ($response_data->country->iso2) {
-                case "RU":
-                    $response_data->country->name = "Russia";
-                    $response_data->country->name_alt = "Russian Federation";
-                    $response_data->country->name_ll = null;
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg";
-                    $response_data->country->iso3 = "RUS";
-                    break;
-                case "CD":
-                    $response_data->country->name = "Congo, The Democratic Republic of the";
-                    $response_data->country->name_alt = "Congo, Dem. Rep.";
-                    $response_data->country->name_ll = null;
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg";
-                    $response_data->country->iso3 = "COD";
-                    break;
-                case "LY":
-                    $response_data->country->name = "Libya";
-                    $response_data->country->name_alt = "Libya";
-                    $response_data->country->name_ll = null;
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Libya.svg";
-                    $response_data->country->iso3 = "LBY";
-                    break;
-                case "BO":
-                    $response_data->country->name = "Bolivia";
-                    $response_data->country->name_alt = "Bolivia (Plurinational State of)";
-                    $response_data->country->name_ll = null;
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Bolivia.svg";
-                    $response_data->country->iso3 = "BOL";
-                    break;
-                case "VE":
-                    $response_data->country->name = "Venezuela";
-                    $response_data->country->name_alt = "Venezuela, RB";
-                    $response_data->country->name_ll = "Venezuela (Bolivarian Republic of)";
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg";
-                    $response_data->country->iso3 = "VEN";
-                    break;
-                case "KP":
-                    $response_data->country->name = "North Korea";
-                    $response_data->country->name_alt = "Korea, Dem. People’s Rep.";
-                    $response_data->country->name_ll = "Democratic People's Republic of Korea";
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg";
-                    $response_data->country->iso3 = "PRK";
-                    break;
-                case "KR":
-                    $response_data->country->name = "South Korea";
-                    $response_data->country->name_alt = "Korea, Rep.";
-                    $response_data->country->name_ll = "Republic of Korea";
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg";
-                    $response_data->country->iso3 = "KOR";
-                    break;
-                case "CI":
-                    $response_data->country->name = "Ivory Coast";
-                    $response_data->country->name_alt = "Côte d'Ivoire";
-                    $response_data->country->name_ll = "Cote d'Ivoire";
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg";
-                    $response_data->country->iso3 = "CIV";
-                    break;
-                case "TZ":
-                    $response_data->country->name = "Tanzania";
-                    $response_data->country->name_alt = "United Republic of Tanzania";
-                    $response_data->country->name_ll = null;
-                    $response_data->country->flag = "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tanzania.svg";
-                    $response_data->country->iso3 = "TZA";
-                    break;
-                default:
-                    $response_data->country->name = null;
-                    $response_data->country->name_alt = null;
-                    $response_data->country->flag = null;
-                    $response_data->country->iso3 = null;
-                    $response_data->country->name_ll = null;
-                    break;
-            }
-        } else {
-            $decoded_data = json_decode($data);
-            $flag_data = $decoded_data->data;
-
-            $response_data->country->name = $flag_data->name;
-            $response_data->country->flag = $flag_data->flag;
-            $response_data->country->iso3 = $flag_data->iso3;
-            $response_data->country->name_alt = null;
-            $response_data->country->name_ll = null;
-        }
-
-        // Fixing supplier api incosistent country names
-        switch ($response_data->country->name) {
-            case 'Bahamas':
-                $response_data->country->name_alt = "Bahamas, The";
-                break;
-            case 'Congo':
-                $response_data->country->name_alt = "Congo Rep.";
-                $response_data->country->name_ll = "Congo, Rep.";
-                break;
-            case 'Hong Kong':
-                $response_data->country->name_alt = "China, Hong Kong SAR";
-                $response_data->country->name_ll = "Hong Kong SAR, China";
-                break;
-            case 'Iran, Islamic Rep.':
-                $response_data->country->name_alt = "Iran (Islamic Republic of)";
-                $response_data->country->name_ll = "Iran";
-                break;
-            case 'Sudan':
-                $response_data->country->name_alt = "Republic of South Sudan";
-                break;
-            case 'United Kingdom':
-                $response_data->country->name_alt = "United Kingdom of Great Britain and Northern Ireland";
-                break;
-            case 'Tanzania':
-                $response_data->country->name_alt = "United Republic of Tanzania";
-                break;
-            case 'United States':
-                $response_data->country->name_alt = "United States of America";
-                break;
-            case 'Yemen':
-                $response_data->country->name_alt = "Yemen, Rep.";
-                break;
-            default:
-                break;
-        }
+        $response_data->country = $this->get_countries($post_data['iso2']);
 
         // States
-        $url = 'https://countriesnow.space/api/v0.1/countries/states';
-        $data = ["country" => $response_data->country->name];
+        $url = "https://countriesnow.space/api/v0.1/countries/states";
+        $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
+        $response_data->country->states = $retrived_data ? $retrived_data->states : null;
 
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data),
-            ],
-        ];
+        // Capital
+        $url = "https://countriesnow.space/api/v0.1/countries/capital";
+        $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
+        $response_data->country->capital = $retrived_data ? $retrived_data->capital : null;
 
-        $context = stream_context_create($options);
-        $data = @file_get_contents($url, false, $context);
-
-        if ($data === false) {
-            $ll_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/states');
-            $decoded_ll_data = json_decode($ll_data)->data;
-            $obj = array_column($decoded_ll_data, null, 'iso2')[$response_data->country->iso2] ?? false;
-            if ($obj) {
-                $transf = new \stdClass();
-                $transf->data = $obj;
-                $data = json_encode($transf);
-            }
-        }
-
-        if ($data != false) {
-            $decoded_data = json_decode($data);
-            $states_data = $decoded_data->data;
-
-            $response_data->country->states = $states_data->states;
-        }
+        // Currency
+        $url = "https://countriesnow.space/api/v0.1/countries/currency";
+        $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
+        $response_data->country->currency = $retrived_data ? $retrived_data->currency : null;
 
         // Population
-        $url = 'https://countriesnow.space/api/v0.1/countries/population';
-        $data = ["country" => $response_data->country->name];
+        $url = "https://countriesnow.space/api/v0.1/countries/population";
+        $retrived_data = $this->retrive_country_property($response_data->country, $url, $url);
 
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query($data),
-            ],
-        ];
+        $response_data->country->population_count = [];
+        $response_data->country->population_years = [];
 
-        $context = stream_context_create($options);
-        $data = @file_get_contents($url, false, $context);
-
-        if ($data === false && $response_data->country->name_alt) {
-            $data_alt = ["country" => $response_data->country->name_alt];
-            $options_alt = [
-                'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method' => 'POST',
-                    'content' => http_build_query($data_alt),
-                ],
-            ];
-            $context_alt = stream_context_create($options_alt);
-            $data = @file_get_contents($url, false, $context_alt);
-        }
-
-        if ($data === false) {
-            $ll_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
-            $decoded_ll_data = json_decode($ll_data)->data;
-            $obj = array_column($decoded_ll_data, null, 'country')[$response_data->country->name] ?? false;
-            if (!$obj) {
-                $obj = array_column($decoded_ll_data, null, 'country')[$response_data->country->name_alt] ?? false;
-            }
-            if (!$obj) {
-                $obj = array_column($decoded_ll_data, null, 'country')[$response_data->country->name_ll] ?? false;
-            }
-            if ($obj) {
-                $transf = new \stdClass();
-                $transf->data = $obj;
-                $data = json_encode($transf);
-            }
-        }
-
-        if ($data != false) {
-            $decoded_data = json_decode($data);
-            $population_data = $decoded_data->data;
-
-            $response_data->country->population_count = [];
-            $response_data->country->population_years = [];
-
-            foreach ($population_data->populationCounts as $item) {
+        if ($retrived_data) {
+            foreach ($retrived_data->populationCounts as $item) {
                 $response_data->country->population_years[] = $item->year;
                 $response_data->country->population_count[] = $item->value;
                 $response_data->country->population[] = [$item->year, $item->value];
@@ -463,8 +197,8 @@ class ApiCitiesController extends AbstractController
         $data = @file_get_contents($url_cities, false, $context_cities);
 
         // Second attempt - diffrent name
-        if ($data === false && $response_data->country->name_alt) {
-            $data_alt = ['orderBy' => 'populationCounts', "order" => $post_data['order'], "country" => $response_data->country->name_alt];
+        if ($data === false && $response_data->country->name_2) {
+            $data_alt = ['orderBy' => 'populationCounts', "order" => $post_data['order'], "country" => $response_data->country->name_2];
             $options_alt = [
                 'http' => [
                     'header' => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -497,8 +231,8 @@ class ApiCitiesController extends AbstractController
             foreach ($cities_data as $item) {
                 if (
                     $item->country == $response_data->country->name ||
-                    $item->country == $response_data->country->name_alt ||
-                    $item->country == $response_data->country->name_ll
+                    $item->country == $response_data->country->name_2 ||
+                    $item->country == $response_data->country->name_3
                 ) {
                     $array_of_cities[] = $item;
                 }
@@ -531,6 +265,8 @@ class ApiCitiesController extends AbstractController
             $response_data->cities = null;
         }
 
+        ////////////
+
         $response_data = json_encode($response_data);
 
         $response = new Response();
@@ -539,5 +275,230 @@ class ApiCitiesController extends AbstractController
         $response->setContent($response_data);
 
         return $response;
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    public function retrive_country_property($country, $url_single, $url_all)
+    {
+        $data = ["country" => $country->name];
+
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $data = @file_get_contents($url_single, false, $context);
+
+        if ($data === false) {
+            $data = ["country" => $country->name_2];
+
+            $options = [
+                'http' => [
+                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method' => 'POST',
+                    'content' => http_build_query($data),
+                ],
+            ];
+
+            $context = stream_context_create($options);
+            $data = @file_get_contents($url_single, false, $context);
+        }
+
+        if ($data === false) {
+            $data = ["country" => $country->name_3];
+
+            $options = [
+                'http' => [
+                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method' => 'POST',
+                    'content' => http_build_query($data),
+                ],
+            ];
+
+            $context = stream_context_create($options);
+            $data = @file_get_contents($url_single, false, $context);
+        }
+
+        if ($data === false) {
+            $data = file_get_contents($url_all);
+            $decoded_data = json_decode($data)->data;
+            $obj = array_column($decoded_data, null, 'iso2')[$country->iso2] ?? false;
+            if (!$obj) {
+                $obj = array_column($decoded_data, null, 'iso3')[$country->iso3] ?? false;
+            }
+            if (!$obj) {
+                $obj = array_column($decoded_data, null, 'name')[$country->name] ?? false;
+            }
+            if (!$obj) {
+                $obj = array_column($decoded_data, null, 'name_2')[$country->name_2] ?? false;
+            }
+            if (!$obj) {
+                $obj = array_column($decoded_data, null, 'name_3')[$country->name_3] ?? false;
+            }
+            if ($obj) {
+                $transf = new \stdClass();
+                $transf->data = $obj;
+                $data = json_encode($transf);
+            }
+        }
+
+        if ($data != false) {
+            $decoded_data = json_decode($data);
+            $retrived_data = $decoded_data->data;
+            return $retrived_data;
+        } else {
+            return null;
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////
+
+    public function get_countries($selected = null)
+    {
+        $countries_data = file_get_contents(
+            'https://countriesnow.space/api/v0.1/countries/flag/images'
+        );
+        $decoded_countries_data = json_decode($countries_data)->data;
+
+        foreach ($decoded_countries_data as $decoded_country) {
+            // Fixing supplier api incosistent country names
+            switch ($decoded_country->name) {
+                case 'Bahamas':
+                    $decoded_country->name_2 = "Bahamas, The";
+                    $decoded_country->name_3 = null;
+                    break;
+                case 'Congo':
+                    $decoded_country->name_2 = "Congo Rep.";
+                    $decoded_country->name_3 = "Congo, Rep.";
+                    break;
+                case 'Hong Kong':
+                    $decoded_country->name_2 = "China, Hong Kong SAR";
+                    $decoded_country->name_3 = "Hong Kong SAR, China";
+                    break;
+                case 'Iran, Islamic Rep.':
+                    $decoded_country->name_2 = "Iran (Islamic Republic of)";
+                    $decoded_country->name_3 = "Iran";
+                    break;
+                case 'Sudan':
+                    $decoded_country->name_2 = "Republic of South Sudan";
+                    $decoded_country->name_3 = null;
+                    break;
+                case 'United Kingdom':
+                    $decoded_country->name_2 = "United Kingdom of Great Britain and Northern Ireland";
+                    $decoded_country->name_3 = null;
+                    break;
+                case 'Tanzania':
+                    $decoded_country->name_2 = "United Republic of Tanzania";
+                    $decoded_country->name_3 = null;
+                    break;
+                case 'United States':
+                    $decoded_country->name_2 = "United States of America";
+                    $decoded_country->name_3 = null;
+                    break;
+                case 'Yemen':
+                    $decoded_country->name_2 = "Yemen, Rep.";
+                    $decoded_country->name_3 = null;
+                    break;
+                default:
+                    $decoded_country->name_2 = null;
+                    $decoded_country->name_3 = null;
+                    break;
+            }
+        }
+
+        // Add missing supplier Data
+        $decoded_countries_data[] = (object) [
+            "name" => "Russia",
+            "name_2" => "Russian Federation",
+            "name_3" => null,
+            "flag" => "https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg",
+            "iso2" => "RU",
+            "iso3" => "RUS"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "Congo, The Democratic Republic of the",
+            "name_2" => "Congo, Dem. Rep.",
+            "name_3" => null,
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg",
+            "iso2" => "CD",
+            "iso3" => "COD"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "Libya",
+            "name_2" => null,
+            "name_3" => null,
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Libya.svg",
+            "iso2" => "LY",
+            "iso3" => "LBY"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "Bolivia",
+            "name_2" => "Bolivia (Plurinational State of)",
+            "name_3" => null,
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Bolivia.svg",
+            "iso2" => "BO",
+            "iso3" => "BOL"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "Venezuela",
+            "name_2" => "Venezuela, RB",
+            "name_3" => "Venezuela (Bolivarian Republic of)",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg",
+            "iso2" => "VE",
+            "iso3" => "VEN"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "North Korea",
+            "name_2" => "Korea, Dem. People’s Rep.",
+            "name_3" => "Democratic People's Republic of Korea",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg",
+            "iso2" => "KP",
+            "iso3" => "PRK"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "South Korea",
+            "name_2" => "Korea, Rep.",
+            "name_3" => "Republic of Korea",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg",
+            "iso2" => "KR",
+            "iso3" => "KOR"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "Ivory Coast",
+            "name_2" => "Côte d'Ivoire",
+            "name_3" => "Cote d'Ivoire",
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg",
+            "iso2" => "CI",
+            "iso3" => "CIV"
+        ];
+        $decoded_countries_data[] = (object) [
+            "name" => "Tanzania",
+            "name_2" => "United Republic of Tanzania",
+            "name_3" => null,
+            "flag" => "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tanzania.svg",
+            "iso2" => "TZ",
+            "iso3" => "TZA"
+        ];
+
+        if ($selected) {
+            $country = array_column($decoded_countries_data, null, 'iso2')[$selected] ?? false;
+            return $country;
+        } else {
+            // Extract names into a separate array
+            $names = array_map(function ($item) {
+                return $item->name;
+            }, $decoded_countries_data);
+
+            // Sort the original array based on the names
+            array_multisort($names, SORT_ASC, $decoded_countries_data);
+
+            return $decoded_countries_data;
+        }
     }
 }

@@ -14,7 +14,7 @@ const TableHead = ({ columns, handleSorting, defaultSorting }) => {
   return (
     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
       <tr>
-        {columns.map(({ label, accessor, formatImage }) => {
+        {columns.map(({ label, accessor, formatImage, disableSorting }) => {
           let arrow = "";
           if (
             (sortField === accessor && order === "asc") ||
@@ -64,17 +64,22 @@ const TableHead = ({ columns, handleSorting, defaultSorting }) => {
             );
           }
 
-          const clickable = formatImage
+          let clickable = formatImage
             ? null
             : () => handleSortingChange(accessor);
-          const clickable_classname = formatImage
-            ? "flex"
-            : "flex cursor-pointer";
+          let clickable_classname = formatImage
+            ? "flex justify-center items-center"
+            : "flex justify-center items-center cursor-pointer";
+
+          if (disableSorting) {
+            clickable = null;
+            clickable_classname = "flex justify-center items-center";
+          }
 
           return (
             <th
               scope="col"
-              className="px-6 py-3"
+              className="px-3 py-3 text-center"
               key={accessor}
               onClick={clickable}
             >

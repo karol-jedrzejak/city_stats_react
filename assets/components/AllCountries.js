@@ -25,15 +25,29 @@ class AllCountries extends Component {
       { label: "Id", accessor: "id" },
       {
         label: "Country",
-        accessor: "country",
+        accessor: "name",
         link: true,
         link_accessor: "iso2",
         classNames: "cursor-pointer",
       },
-      { label: "Flag", accessor: "flag", formatImage: true },
-      { label: "ISO2 Code", accessor: "iso2" },
-      { label: "ISO3 Code", accessor: "iso3" },
-      { label: "Year", accessor: "population_year" },
+      {
+        label: "Alt. Name",
+        accessor: "name_2",
+        disableSorting: true,
+      },
+      {
+        label: "Alt. Name",
+        accessor: "name_3",
+        disableSorting: true,
+      },
+      {
+        label: "Flag",
+        accessor: "flag",
+        formatImage: true,
+        classNames: "w-48 flex justify-center items-center",
+      },
+      { label: "ISO2 Code", accessor: "iso2", classNames: "text-center" },
+      { label: "ISO3 Code", accessor: "iso3", classNames: "text-center" },
       {
         label: "Population",
         accessor: "population_value",
@@ -43,7 +57,7 @@ class AllCountries extends Component {
     ];
 
     this.defaultSorting_countries = {
-      accessor: "country",
+      accessor: "name",
       direction: "asc",
     };
   }
@@ -105,12 +119,29 @@ class AllCountries extends Component {
                             <Popup>
                               <img className="w-12" src={item.flag} />
                               <br />
-                              <br />
                               <b>
-                                {item.country} [{item.iso3}]
+                                {item.name} [{item.iso3}]
                               </b>
+                              {item.name_2 ? (
+                                <span>
+                                  <br />
+                                  Alt. name - {item.name_2}
+                                </span>
+                              ) : (
+                                ""
+                              )}
+                              {item.name_3 ? (
+                                <span>
+                                  <br />
+                                  Alt. name 2 - {item.name_3}
+                                </span>
+                              ) : (
+                                ""
+                              )}
                               <br />
-                              {item.population_year} -{" "}
+                              <br />
+                              Population ({item.population_year}):
+                              <br />
                               {Intl.NumberFormat().format(
                                 item.population_value
                               )}{" "}

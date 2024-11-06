@@ -90,7 +90,7 @@ class Country extends Component {
         },
         chart_series: [
           {
-            name: "series-1",
+            name: "Population [mln]",
             data: response.data.country.population,
           },
         ],
@@ -100,17 +100,6 @@ class Country extends Component {
 
   render() {
     const loading_cities = this.state.loading_cities;
-    /* 
-    function population() {
-      return (
-        <Chart
-          options={this.state.chart_options}
-          series={this.state.chart_series}
-          type="area"
-          height={350}
-        />
-      );
-    } */
 
     return (
       <div className="min-h-full bg-gray-50 pb-10">
@@ -134,19 +123,43 @@ class Country extends Component {
                               <table>
                                 <tbody>
                                   <tr>
-                                    <td className="p-4">Nazwa:</td>
+                                    <td className="p-4">Name:</td>
                                     <td className="p-4">
                                       {this.state.country.name}
                                     </td>
                                   </tr>
                                   <tr>
-                                    <td className="p-4">ISO2:</td>
+                                    <td className="p-4">Alt. Name:</td>
+                                    <td className="p-4">
+                                      {this.state.country.name_2}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">Alt. Name 2:</td>
+                                    <td className="p-4">
+                                      {this.state.country.name_3}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">Capital:</td>
+                                    <td className="p-4">
+                                      {this.state.country.capital}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">Currency:</td>
+                                    <td className="p-4">
+                                      {this.state.country.currency}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-4">ISO 2 Code:</td>
                                     <td className="p-4">
                                       {this.state.country.iso2}
                                     </td>
                                   </tr>
                                   <tr>
-                                    <td className="p-4">iso3:</td>
+                                    <td className="p-4">ISO 3 Code:</td>
                                     <td className="p-4">
                                       {this.state.country.iso3}
                                     </td>
