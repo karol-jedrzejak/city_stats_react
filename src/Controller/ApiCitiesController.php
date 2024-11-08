@@ -33,34 +33,39 @@ class ApiCitiesController extends AbstractController
         }
 
         $decoded_data = json_decode($data);
-        $cities_data = $decoded_data->data;
 
-        // Get GPS coordinates
-        $data_gps = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
-        $decoded_data_gps = json_decode($data_gps);
+        $all_cities_data = $decoded_data->data;
 
-        foreach ($cities_data as $key => $item) {
+        $selected_cities = ['MOSKVA', 'SEOUL', 'BUENOS AIRES', 'TOKYO', 'MEXICO, CIUDAD DE', 'HONG KONG SAR', 'SINGAPORE', 'SANTIAGO', 'Sydney', 'ROMA'];
+
+        $selected_cities_data = [];
+
+        foreach ($all_cities_data as $key => $item) {
             if (is_numeric($item->populationCounts[0]->value)) {
                 $item->population_value = (int) $item->populationCounts[0]->value;
                 $item->population_year = $item->populationCounts[0]->year;
                 $item->id = $key;
-
-                $obj = array_column($decoded_data_gps->data, null, 'name')[$item->country] ?? null;
-                if ($obj) {
-                    $item->iso2 = $obj->iso2;
-                    $item->long = $obj->long;
-                    $item->lat = $obj->lat;
-                } else {
-                    $item->iso2 = "";
-                    $item->long = 0;
-                    $item->lat = 0;
-                }
             } else {
-                unset($cities_data[$key]);
+                unset($all_cities_data[$key]);
+            }
+
+            if ($key < 100) {
+                if (in_array($item->city, $selected_cities)) {
+                    $selected_city_data = new \stdClass();
+                    $selected_city_data->name = $item->city;
+                    $selected_city_data->data = [];
+                    foreach ($item->populationCounts as $item2) {
+                        $selected_city_data->data[] = [$item2->year, $item2->value];
+                    }
+                    $selected_cities_data[] = $selected_city_data;
+                }
             }
         }
 
-        $data = json_encode($cities_data);
+        $data_obj = new \stdClass();
+        $data_obj->allCities = $all_cities_data;
+        $data_obj->selected_cities_data = $selected_cities_data;
+        $data = json_encode($data_obj);
 
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -78,9 +83,11 @@ class ApiCitiesController extends AbstractController
 
         $population_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
         $position_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/positions');
+        $capitals_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/capital');
 
         $decoded_population_data = json_decode($population_data)->data;
         $decoded_position_data = json_decode($position_data)->data;
+        $decoded_capitals_data = json_decode($capitals_data)->data;
 
         $decoded_flags_data = $this->get_countries();
 
@@ -88,7 +95,8 @@ class ApiCitiesController extends AbstractController
         $id = 1;
         foreach ($decoded_flags_data as $item) {
 
-            $obj = array_column($decoded_population_data, null, 'iso3')[$item->iso3] ?? false;
+            $obj_population = array_column($decoded_population_data, null, 'iso3')[$item->iso3] ?? false;
+            $obj_capitals = array_column($decoded_capitals_data, null, 'iso3')[$item->iso3] ?? false;
 
             //wrong iso correction
             switch ($item->iso2) {
@@ -99,18 +107,24 @@ class ApiCitiesController extends AbstractController
                     $iso2_search = $item->iso2;
                     break;
             }
-            $obj2 = array_column($decoded_position_data, null, 'iso2')[$iso2_search] ?? false;
+            $obj_position = array_column($decoded_position_data, null, 'iso2')[$iso2_search] ?? false;
 
-            if ($obj) {
-                $item->populationCounts = $obj->populationCounts;
+            if ($obj_population) {
+                $item->populationCounts = $obj_population->populationCounts;
                 $item->id = $id;
 
                 $item->population_value = (int) $item->populationCounts[count($item->populationCounts) - 1]->value;
                 $item->population_year = $item->populationCounts[count($item->populationCounts) - 1]->year;
 
-                if ($obj2) {
-                    $item->long = $obj2->long;
-                    $item->lat = $obj2->lat;
+                if ($obj_position) {
+                    $item->long = $obj_position->long;
+                    $item->lat = $obj_position->lat;
+                }
+
+                if ($obj_capitals) {
+                    $item->capital = $obj_capitals->capital;
+                } else {
+                    $item->capital = null;
                 }
 
                 $cities_data[] = $item;
@@ -182,10 +196,10 @@ class ApiCitiesController extends AbstractController
     #[Route('/api/country', methods: ['get'], name: 'api.country')]
     public function country(Request $request): Response
     {
-    $post_data['iso2'] = "KR";
-    $post_data['order'] = "asc";
+        $post_data['iso2'] = "KR";
+        $post_data['order'] = "asc"; */
 
- */
+
 
     #[Route('/api/country', methods: ['post'], name: 'api.country')]
     public function country(Request $request): Response
@@ -392,30 +406,32 @@ class ApiCitiesController extends AbstractController
 
     public function retrive_country_property($country, $url_single, $url_all, $accesor = "country")
     {
-        switch ($accesor) {
-            case 'iso2':
-                $data_arrays = [["iso2" => $country->iso2]];
-                break;
-
-            default:
-                $data_arrays = [["country" => $country->name], ["country" => $country->name_2], ["country" => $country->name_3]];
-                break;
-        }
-
         $data = false;
 
-        foreach ($data_arrays as $data_array) {
-            if ($data === false) {
-                $options = [
-                    'http' => [
-                        'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                        'method' => 'POST',
-                        'content' => http_build_query($data_array),
-                    ],
-                ];
+        if ($url_single) {
+            switch ($accesor) {
+                case 'iso2':
+                    $data_arrays = [["iso2" => $country->iso2]];
+                    break;
 
-                $context = stream_context_create($options);
-                $data = @file_get_contents($url_single, false, $context);
+                default:
+                    $data_arrays = [["country" => $country->name], ["country" => $country->name_2], ["country" => $country->name_3]];
+                    break;
+            }
+
+            foreach ($data_arrays as $data_array) {
+                if ($data === false) {
+                    $options = [
+                        'http' => [
+                            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                            'method' => 'POST',
+                            'content' => http_build_query($data_array),
+                        ],
+                    ];
+
+                    $context = stream_context_create($options);
+                    $data = @file_get_contents($url_single, false, $context);
+                }
             }
         }
 

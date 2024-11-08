@@ -79,9 +79,6 @@ class Country extends Component {
         }
       }
 
-      console.log(response.data);
-      console.log(cities_data);
-
       this.setState({
         cities: response.data.cities,
         country: response.data.country,
@@ -235,7 +232,7 @@ class Country extends Component {
                     </div>
                     {/* ///////////////////// */}
                     <div className="relative">
-                      <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                      <div className="absolute inset-px rounded-lg bg-white"></div>
                       <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)]">
                         <div className="p-8 sm:p-10">
                           <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
@@ -277,7 +274,7 @@ class Country extends Component {
                     </div>
                     {/* ///////////////////// */}
                     <div className="relative">
-                      <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                      <div className="absolute inset-px rounded-lg bg-white lg:rounded-r-[2rem]"></div>
                       <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-r-[calc(2rem+1px)]">
                         <div className="p-8 h-full flex justify-center items-center">
                           <img
@@ -294,7 +291,7 @@ class Country extends Component {
                 {/* ///////////////////// */}
                 <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                   <div className="p-10 relative">
-                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                     <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                       <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                         POPULATION:
@@ -318,7 +315,7 @@ class Country extends Component {
                 {/* ///////////////////// */}
                 <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                   <div className="p-10 relative">
-                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                     <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                       <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                         10 BIGEST CITIES POPULATION:
@@ -329,7 +326,7 @@ class Country extends Component {
                             options={this.state.chart_cities_options}
                             series={this.state.chart_cities_series}
                             type="area"
-                            height={700}
+                            height={350}
                           />
                         ) : (
                           <div>Missing Data in Supplier Api</div>
@@ -342,7 +339,7 @@ class Country extends Component {
                 {/* ///////////////////// */}
                 <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                   <div className="p-10 relative">
-                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                     <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                       <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                         CITIES:
@@ -366,7 +363,7 @@ class Country extends Component {
                 {/* ///////////////////// */}
                 <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                   <div className="p-10 relative">
-                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                    <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                     <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                       <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                         STATES:

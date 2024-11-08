@@ -34,14 +34,8 @@ class AllCountries extends Component {
         classNames: "cursor-pointer",
       },
       {
-        label: "Alt. Name",
-        accessor: "name_2",
-        disableSorting: true,
-      },
-      {
-        label: "Alt. Name",
-        accessor: "name_3",
-        disableSorting: true,
+        label: "Capital",
+        accessor: "capital",
       },
       {
         label: "Flag",
@@ -138,7 +132,7 @@ class AllCountries extends Component {
               <div className="pt-4 mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
                 {/* MAP */}
                 <div className="p-10 relative">
-                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                     <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                       MAP:
@@ -207,7 +201,7 @@ class AllCountries extends Component {
                 </div>
                 {/* Population */}
                 <div className="mt-10 p-10 relative">
-                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                     <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                       Population:
@@ -229,7 +223,7 @@ class AllCountries extends Component {
                 </div>
                 {/* Countries */}
                 <div className="mt-10 p-10 relative">
-                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
+                  <div className="absolute inset-px rounded-lg bg-white lg:rounded-[2rem]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                     <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
                       COUNTRIES:

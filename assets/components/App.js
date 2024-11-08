@@ -5,18 +5,12 @@ import Navigation from "./Navigation";
 import AllCities from "./AllCities";
 import AllCountries from "./AllCountries";
 import Country from "./Country";
-import Capitals from "./Capitals";
-import City from "./City";
-import Map from "./Map";
 
 const App = () => {
   const [navigation, setNavigation] = useState([
     { name: "All Countries", href: "#", current: true }, // dane wszystkich miast
     { name: "All Cities", href: "#", current: false }, // dane wszystkich miast
     { name: "Country", href: "#", current: false }, // dane wszystkich miast w danym kraju
-    { name: "Capitals", href: "#", current: false }, // dane wszystkich stolic
-    { name: "City", href: "#", current: false }, // dane wybranego miasta
-    { name: "Map", href: "#", current: false }, // mapka państw
   ]);
 
   const [currentCountry, setCurrentCountry] = useState("PL");
@@ -52,14 +46,8 @@ const App = () => {
             currentCountry={currentCountry}
           />
         );
-      case "Capitals":
-        return <Capitals />;
-      case "City":
-        return <City />;
-      case "Map":
-        return <Map />;
       default:
-        return <ByPopulation />;
+        return <AllCities changeCurrent={changeCurrent} />;
     }
   };
 
