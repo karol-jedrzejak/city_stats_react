@@ -70,7 +70,7 @@ const App = () => {
         setNavigation={setNavigation}
         changeCurrent={changeCurrent}
       />
-      <div className="bg-gray-50">{project()}</div>
+      <div className="bg-gray-50 mt-[64px]">{project()}</div>
     </div>
   );
 };

@@ -139,8 +139,31 @@ class ApiCitiesController extends AbstractController
         $population_data = file_get_contents('https://countriesnow.space/api/v0.1/countries/population');
         $decoded_population_data = json_decode($population_data)->data;
 
-        $obj = array_column($decoded_population_data, null, 'country')["World"] ?? false;
-        $data = json_encode($obj->populationCounts);
+        $response_data = [];
+
+        $search_array = [
+            "World",
+            "North America",
+            "Europe & Central Asia",
+            "East Asia & Pacific",
+            "South Asia",
+            "Middle East & North Africa",
+            "Sub-Saharan Africa",
+            "Australia",
+        ];
+
+        foreach ($search_array as $search_value) {
+            $obj = array_column($decoded_population_data, null, 'country')[$search_value] ?? false;
+            $single_data = new \stdClass();
+            $single_data->name = $obj->country;
+
+            foreach ($obj->populationCounts as $item) {
+                $single_data->data[] = [$item->year, $item->value];
+            }
+            $response_data[] = $single_data;
+        }
+
+        $data = json_encode($response_data);
 
         $response = new Response();
 

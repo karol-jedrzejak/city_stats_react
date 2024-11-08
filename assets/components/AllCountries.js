@@ -73,9 +73,10 @@ class AllCountries extends Component {
   // get world population
   getWorldPopulation() {
     axios.get(`http://localhost:8000/api/world_population`).then((response) => {
-      let population = [];
-      response.data.forEach((element) => {
-        population.push([new Date(element.year, 1, 1), element.value]);
+      response.data.forEach((entry) => {
+        entry.data.forEach((element) => {
+          element = [new Date(element[0], 1, 1), element[1]];
+        });
       });
 
       this.setState({
@@ -110,12 +111,7 @@ class AllCountries extends Component {
             },
           },
         },
-        world_population_series: [
-          {
-            name: "Population [mln]",
-            data: population,
-          },
-        ],
+        world_population_series: response.data,
       });
     });
   }
@@ -151,7 +147,7 @@ class AllCountries extends Component {
                       <MapContainer
                         center={[51.505, -0.09]}
                         zoom={7}
-                        style={{ height: "400px" }}
+                        style={{ height: "400px", zIndex: 3 }}
                       >
                         <TileLayer
                           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -210,7 +206,7 @@ class AllCountries extends Component {
                   <div className="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-[2rem]"></div>
                 </div>
                 {/* Population */}
-                <div className="p-10 relative">
+                <div className="mt-10 p-10 relative">
                   <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-[calc(2rem+1px)]">
                     <p className="m-5 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
