@@ -1,6 +1,6 @@
 # City Stats
  
- <img src="https://karol-jedrzejak.github.io/static/media/7.d4bc98b6d4d3a897dc9d.jpg" height="400">
+<img src="https://github.com/karol-jedrzejak/karol-jedrzejak.github.io/blob/master/src/assets/projects/7.jpg" height="400">
 
 ## About Project
 
